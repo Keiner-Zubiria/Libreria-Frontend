@@ -1,0 +1,48 @@
+.book-list {
+    max-width: 1400px;
+
+    margin: auto;
+
+    padding: 60px 40px;
+}
+
+
+.book-list .section-title {
+    text-align: center;
+
+    margin-bottom: 40px;
+}
+
+
+.book-list .section-title h2 {
+    font-size: 36px;
+
+    color: #111827;
+}
+
+
+.book-list .section-title p {
+    margin-top: 10px;
+
+    color: #6B7280;
+}
+
+
+.books-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 25px;
+}
+
+
+.book-link {
+
+    display: block;
+
+    text-decoration: none;
+
+    color: inherit;
+
+}

@@ -1,0 +1,142 @@
+.dashboard {
+    width: 100%;
+}
+
+
+/* Encabezado */
+.admin-header {
+    margin-bottom: 35px;
+}
+
+
+.admin-header h1 {
+    margin: 0;
+    color: #111827;
+    font-size: 32px;
+}
+
+
+.admin-header p {
+    margin-top: 10px;
+    color: #6B7280;
+    font-size: 15px;
+}
+
+
+
+/* Tarjetas */
+.admin-cards {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 25px;
+
+}
+
+
+
+/* Cada acceso */
+.admin-card {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 18px;
+
+    padding: 28px;
+
+    background: white;
+
+    border: 1px solid #E5E7EB;
+
+    border-radius: 18px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    min-height: 150px;
+
+    transition: 0.25s;
+
+}
+
+
+
+.admin-card:hover {
+
+    transform: translateY(-4px);
+
+    border-color: #2563EB;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+
+}
+
+
+
+/* Iconos */
+.admin-card svg {
+
+    color: #2563EB;
+
+    margin-top: 5px;
+
+}
+
+
+
+/* Texto */
+.admin-card h2 {
+
+    margin: 0 0 5px;
+
+    font-size: 20px;
+
+    color: #111827;
+
+}
+
+
+
+.admin-card span {
+
+    display: block;
+
+    color: #2563EB;
+
+    font-size: 14px;
+
+    margin-bottom: 10px;
+
+}
+
+
+
+.admin-card p {
+
+    margin: 0;
+
+    color: #6B7280;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+}
+
+
+
+/* Responsive */
+@media(max-width:800px) {
+
+    .admin-cards {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}

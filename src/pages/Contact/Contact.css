@@ -1,0 +1,154 @@
+.contact-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 70px 40px;
+}
+.contact-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+.contact-header h1 {
+    font-size: 42px;
+    color: #111827;
+    margin: 0;
+}
+.contact-header p {
+    margin-top: 12px;
+    color: #6B7280;
+    font-size: 17px;
+}
+.contact-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: start;
+}
+.contact-info,
+.contact-form-container {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+.contact-info h2,
+.contact-form-container h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 24px;
+}
+.contact-description {
+    margin: 15px 0 30px;
+    color: #6B7280;
+    line-height: 1.6;
+}
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 22px;
+}
+.contact-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #EFF6FF;
+    color: #2563EB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.contact-item div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.contact-item strong {
+    color: #111827;
+    font-size: 14px;
+}
+.contact-item span {
+    color: #6B7280;
+    font-size: 14px;
+}
+.contact-form {
+    margin-top: 25px;
+}
+.contact-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+.contact-field label {
+    margin-bottom: 7px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+}
+.contact-field input,
+.contact-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #D1D5DB;
+    border-radius: 9px;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: #111827;
+    transition: .2s;
+}
+.contact-field input:focus,
+.contact-field textarea:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+}
+.contact-field textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+.contact-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 9px;
+    background: #2563EB;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
+.contact-button:hover {
+    background: #1D4ED8;
+}
+.contact-success {
+    margin: 15px 0 0;
+    text-align: center;
+    color: #16A34A;
+    font-size: 14px;
+    font-weight: 600;
+}
+@media (max-width: 800px) {
+    .contact-page {
+        padding: 50px 20px;
+    }
+    .contact-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+}
+@media (max-width: 500px) {
+    .contact-header h1 {
+        font-size: 34px;
+    }
+    .contact-info,
+    .contact-form-container {
+        padding: 22px;
+    }
+}

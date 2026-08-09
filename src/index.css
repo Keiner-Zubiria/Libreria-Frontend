@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+* {
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+body {
+
+    font-family: 'Poppins', sans-serif;
+
+    background: #F8FAFC;
+
+    color: #1F2937;
+
+}
+
+
+/* Notificación de producto agregado */
+
+.cart-toast {
+
+    position: fixed;
+
+    top: 90px;
+
+    right: 25px;
+
+    background: #16A34A;
+
+    color: white;
+
+    padding: 15px 22px;
+
+    border-radius: 10px;
+
+    font-weight: 600;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,.18);
+
+    z-index: 9999;
+
+    animation: toastShow .3s ease;
+
+}
+
+
+@keyframes toastShow {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateX(50px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateX(0);
+
+    }
+
+}

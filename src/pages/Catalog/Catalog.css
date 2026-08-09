@@ -1,0 +1,70 @@
+.catalog {
+
+    padding: 40px 60px;
+
+    background: #F9FAFB;
+
+    min-height: 80vh;
+
+}
+
+
+/* Encabezado del catálogo */
+.catalog-header {
+
+    margin-bottom: 30px;
+
+}
+
+
+.catalog-header h1 {
+
+    font-size: 36px;
+
+    color: #111827;
+
+}
+
+
+.catalog-header p {
+
+    margin-top: 10px;
+
+    color: #6B7280;
+
+    font-size: 17px;
+
+}
+
+
+
+/* Cantidad de resultados */
+.catalog-results {
+
+    margin-bottom: 20px;
+
+    color: #374151;
+
+    font-weight: 600;
+
+}
+
+
+
+/* Ajuste del catálogo en pantallas pequeñas */
+@media (max-width: 768px) {
+
+    .catalog {
+
+        padding: 25px;
+
+    }
+
+
+    .catalog-header h1 {
+
+        font-size: 28px;
+
+    }
+
+}

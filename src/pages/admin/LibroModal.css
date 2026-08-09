@@ -1,0 +1,234 @@
+.modal-overlay {
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,.45);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+}
+
+.modal-container {
+
+    width: 100%;
+    max-width: 760px;
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 30px;
+
+    box-shadow: 0 20px 50px rgba(0,0,0,.20);
+
+}
+
+.modal-header {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+
+}
+
+.modal-header h2 {
+
+    margin: 0;
+    color: #111827;
+
+}
+
+.close-button {
+
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+
+}
+
+.modal-form {
+
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 20px;
+
+}
+
+.form-group {
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+}
+
+.form-group label {
+
+    font-size: 14px;
+    color: #374151;
+    font-weight: 600;
+
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+
+    padding: 12px;
+
+    border: 1px solid #D1D5DB;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    font-size: 14px;
+
+}
+
+.form-group textarea {
+
+    resize: vertical;
+
+}
+
+.full-width {
+
+    grid-column: 1 / -1;
+
+}
+
+.checkbox-group {
+
+    justify-content: center;
+
+}
+
+.checkbox-group label {
+
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+}
+
+.modal-buttons {
+
+    grid-column: 1 / -1;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    margin-top: 10px;
+
+}
+
+.cancel-button {
+
+    border: none;
+
+    background: #E5E7EB;
+
+    padding: 12px 18px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+}
+
+.save-button {
+
+    border: none;
+
+    background: #2563EB;
+
+    color: white;
+
+    padding: 12px 18px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+}
+
+.save-button:hover {
+
+    background: #1D4ED8;
+
+}
+
+@media(max-width:700px){
+
+    .modal-container{
+
+        margin:20px;
+
+    }
+
+    .modal-form{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+
+.preview-image{
+
+    margin-top:15px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+}
+
+.preview-image img{
+
+    max-width:140px;
+
+    width:140px;
+
+    max-height:200px;
+
+    height:200px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+    border:1px solid #ff0000;
+
+    display:block;
+
+}
+
+.modal-container{
+
+    width:700px;
+
+    max-width:90vw;
+
+    max-height:90vh;
+
+    overflow-y:auto;
+
+}

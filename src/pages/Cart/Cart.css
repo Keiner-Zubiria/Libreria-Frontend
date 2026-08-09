@@ -1,0 +1,472 @@
+.cart-page {
+
+    max-width: 1200px;
+
+    margin: 40px auto;
+
+    padding: 0 20px;
+
+}
+
+
+.cart-page h1 {
+
+    margin-bottom: 30px;
+
+    color: #111827;
+
+}
+
+
+/* Contenedor principal */
+
+.cart-container {
+
+    display: grid;
+
+    grid-template-columns: 1fr 350px;
+
+    gap: 30px;
+
+}
+
+
+/* Productos */
+
+.cart-products {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+
+.cart-item {
+
+    background: white;
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    display: flex;
+
+    gap: 25px;
+
+    align-items: center;
+
+    border: 1px solid #e5e7eb;
+
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+
+}
+
+
+.cart-item img {
+
+    width: 130px;
+
+    height: 170px;
+
+    object-fit: contain;
+
+    background: #f3f4f6;
+
+    border-radius: 10px;
+
+}
+
+
+.cart-info {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    flex: 1;
+
+}
+
+
+.cart-info h3 {
+
+    margin: 0;
+
+    font-size: 20px;
+
+    color: #111827;
+
+}
+
+
+.cart-info p {
+
+    margin: 0;
+
+    color: #6b7280;
+
+}
+
+.cart-format {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 4px 0;
+    color: #2563EB;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cart-format svg {
+    width: 15px;
+    height: 15px;
+    color: #2563EB;
+    flex-shrink: 0;
+}
+
+
+/* Precio unitario */
+
+.unit-price {
+
+    color: #6b7280;
+
+}
+
+
+.unit-price strong {
+
+    color: #111827;
+
+    margin-left: 5px;
+
+}
+
+
+/* Cantidad */
+
+.quantity-control {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin: 10px 0;
+
+}
+
+
+.quantity-control button {
+
+    width: 35px;
+
+    height: 35px;
+
+    border: none;
+
+    background: #2563EB;
+
+    color: white;
+
+    font-size: 20px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition: .3s;
+
+}
+
+
+.quantity-control button:hover {
+
+    background: #1D4ED8;
+
+}
+
+
+.quantity-control strong {
+
+    font-size: 18px;
+
+}
+
+
+/* Subtotal */
+
+.subtotal {
+
+    font-size: 18px;
+
+    color: #111827;
+
+}
+
+
+.subtotal strong {
+
+    margin-left: 5px;
+
+}
+
+
+/* Botón eliminar */
+
+.remove-button {
+
+    width: fit-content;
+
+    background: #dc2626;
+
+    color: white;
+
+    border: none;
+
+    padding: 10px 16px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition: .3s;
+
+}
+
+
+.remove-button:hover {
+
+    background: #b91c1c;
+
+}
+
+
+/* Resumen */
+
+.cart-summary {
+
+    background: white;
+
+    height: fit-content;
+
+    padding: 25px;
+
+    border-radius: 15px;
+
+    border: 1px solid #e5e7eb;
+
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+
+}
+
+
+.cart-summary h2 {
+
+    margin-top: 0;
+
+    color: #111827;
+
+}
+
+
+.cart-summary h3 {
+
+    font-size: 24px;
+
+    margin: 25px 0;
+
+}
+
+
+/* Solo afecta el botón del carrito */
+
+.cart-summary .buy-button {
+
+    width: 100%;
+
+    border: none;
+
+    background: #2563EB;
+
+    color: white;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: .3s;
+
+}
+
+
+.cart-summary .buy-button:hover {
+
+    background: #1D4ED8;
+
+}
+
+
+/* Carrito vacío */
+
+/* Carrito vacío */
+
+.empty-cart {
+
+    min-height: 450px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    border: 1px solid #e5e7eb;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+
+    text-align: center;
+
+    gap: 15px;
+
+    margin-top: 20px;
+
+    color: #6b7280;
+
+}
+
+
+.empty-cart svg {
+
+    color: #2563eb;
+
+    margin-bottom: 10px;
+
+}
+
+
+.empty-cart h2 {
+
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 28px;
+
+}
+
+
+.empty-cart p {
+
+    max-width: 400px;
+
+    margin: 0;
+
+    line-height: 1.6;
+
+    font-size: 16px;
+
+}
+
+
+
+.empty-cart-button {
+
+    margin-top: 15px;
+
+    background: #2563eb;
+
+    color: white;
+
+    border: none;
+
+    padding: 13px 25px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: .3s;
+
+}
+
+
+.empty-cart-button:hover {
+
+    background: #1d4ed8;
+
+}
+
+
+/* Responsive */
+
+@media (max-width: 900px) {
+
+    .cart-container {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .cart-item {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+}
+
+.cart-format svg {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+.cart-format {
+    color: #2563eb;
+}
+
+
+/* Cantidad de libros virtuales */
+
+.virtual-quantity {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+
+}
+
+
+.virtual-quantity span {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+
+}

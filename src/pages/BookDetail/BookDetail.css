@@ -1,0 +1,368 @@
+.book-detail {
+
+    max-width: 1200px;
+
+    margin: 40px auto;
+
+    padding: 0 20px;
+
+}
+
+
+/* Contenedor principal del producto */
+.detail-container {
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 30px;
+
+    display: grid;
+
+    grid-template-columns: 420px 1fr;
+
+    gap: 50px;
+
+    border: 1px solid #2563EB;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+}
+
+
+/* Imagen grande del libro */
+.detail-image {
+
+    height: 500px;
+
+    background: #F3F4F6;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+}
+
+
+.detail-image img {
+
+    height: 100%;
+
+    max-width: 100%;
+
+    object-fit: contain;
+
+}
+
+
+/* Información del libro */
+.detail-info h1 {
+
+    font-size: 32px;
+
+    color: #111827;
+
+    margin-bottom: 15px;
+
+}
+
+
+.detail-info h3 {
+
+    color: #6B7280;
+
+    font-weight: 500;
+
+    margin-bottom: 20px;
+
+}
+
+
+.detail-category {
+
+    color: #2563EB;
+
+    font-weight: 600;
+
+}
+
+
+.detail-price {
+
+    font-size: 32px;
+
+    color: #111827;
+
+    margin: 25px 0;
+
+}
+
+
+/* Formato */
+.format-box {
+
+    margin-top: 20px;
+
+}
+
+
+.format-title {
+
+    display: block;
+
+    color: #374151;
+
+    font-weight: 600;
+
+    margin-bottom: 10px;
+
+}
+
+
+.format-options {
+
+    display: flex;
+
+    gap: 12px;
+
+}
+
+
+.format-option {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 10px 18px;
+
+    border: 1px solid #D1D5DB;
+
+    background: white;
+
+    color: #374151;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    transition: 0.2s;
+
+}
+
+
+.format-option:hover {
+
+    border-color: #2563EB;
+
+    color: #2563EB;
+
+}
+
+
+.format-option.selected {
+
+    background: #EFF6FF;
+
+    border-color: #2563EB;
+
+    color: #2563EB;
+
+    font-weight: 600;
+
+}
+
+
+/* Disponibilidad */
+.detail-stock {
+
+    color: #4B5563;
+
+    margin-bottom: 5px;
+
+}
+
+
+/* Botones */
+.detail-actions {
+
+    display: flex;
+
+    gap: 15px;
+
+    margin-top: 25px;
+
+}
+
+
+.cart-button-detail {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    border: none;
+
+    background: #2563EB;
+
+    color: white;
+
+    padding: 14px 25px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+}
+
+
+.cart-button-detail:hover {
+
+    background: #1D4ED8;
+
+}
+
+
+.buy-button {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    border: none;
+
+    background: #16A34A;
+
+    color: white;
+
+    padding: 14px 25px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+}
+
+
+.buy-button:hover {
+
+    background: #15803D;
+
+}
+
+
+/* Descripción */
+.description-section {
+
+    margin-top: 30px;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 16px;
+
+    border: 1px solid #2563EB;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+}
+
+
+.description-section h2 {
+
+    color: #111827;
+
+    margin-bottom: 15px;
+
+}
+
+
+.description-section p {
+
+    color: #4B5563;
+
+    line-height: 1.7;
+
+}
+
+
+.quantity-box {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 20px;
+
+    font-size: 16px;
+
+}
+
+
+.quantity-box button {
+
+    width: 35px;
+
+    height: 35px;
+
+    border: 1px solid #2563EB;
+
+    background: white;
+
+    color: #2563EB;
+
+    border-radius: 8px;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+}
+
+
+.quantity-box button:hover {
+
+    background: #2563EB;
+
+    color: white;
+
+}
+
+
+.quantity-box strong {
+
+    font-size: 18px;
+
+    min-width: 25px;
+
+    text-align: center;
+
+}
