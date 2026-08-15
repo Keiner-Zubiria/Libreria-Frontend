@@ -17,14 +17,14 @@
 .book-list .section-title h2 {
     font-size: 36px;
 
-    color: #111827;
+    color: var(--color-texto);
 }
 
 
 .book-list .section-title p {
     margin-top: 10px;
 
-    color: #6B7280;
+    color: var(--color-texto-suave);
 }
 
 
@@ -45,4 +45,82 @@
 
     color: inherit;
 
+}.book-list {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 40px;
+    box-sizing: border-box;
+}
+
+.book-list .section-title {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.book-list .section-title h2 {
+    margin: 0;
+    color: var(--color-texto);
+    font-size: 36px;
+}
+
+.book-list .section-title p {
+    margin-top: 10px;
+    color: var(--color-texto-suave);
+}
+
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 300px));
+    justify-content: start;
+    gap: 28px;
+}
+
+.book-link {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Tablets */
+
+@media (max-width: 700px) {
+
+    .book-list {
+        padding: 45px 25px;
+    }
+
+    .books-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .book-link {
+        max-width: none;
+    }
+}
+
+/* Celulares */
+
+@media (max-width: 450px) {
+
+    .book-list {
+        padding: 35px 15px;
+    }
+
+    .book-list .section-title h2 {
+        font-size: 28px;
+    }
+
+    .books-grid {
+        grid-template-columns: 1fr;
+        justify-content: center;
+    }
+
+    .book-link {
+        max-width: 300px;
+        margin: 0 auto;
+    }
 }

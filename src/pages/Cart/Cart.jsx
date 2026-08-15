@@ -3,489 +3,285 @@ import "./Cart.css";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-import
-{
+import {
     Package,
     Monitor,
     Trash2,
     ShoppingCart
 } from "lucide-react";
 
+import AlertContext from "../../context/AlertContext";
 import CartContext from "../../context/CartContext";
 import AuthContext from "../../context/AuthContext";
+import { UPLOADS_URL } from "../../config/api";
 
-
-// Página del carrito de compras.
 function Cart()
 {
-
     const {
-
         cart,
-
         removeFromCart,
-
         updateQuantity
-
     } = useContext( CartContext );
 
-
     const { usuario } = useContext( AuthContext );
+    const { mostrarMensaje } = useContext( AlertContext );
 
     const navigate = useNavigate();
 
-
-    // Calcula el total de la compra.
     const total = cart.reduce(
-
         ( acc, item ) =>
-
-            acc + (
-
-                item.precio *
-
-                item.quantity
-
-            ),
-
+            acc + ( Number( item.precio ) * Number( item.quantity ) ),
         0
-
     );
 
-
-    // Envía al checkout.
     const finalizarCompra = () =>
     {
-
         if ( cart.length === 0 )
         {
-
-            alert(
-
-                "Tu carrito está vacío."
-
+            mostrarMensaje(
+                "Tu carrito está vacío.",
+                "warning"
             );
 
             return;
-
         }
-
 
         if ( !usuario )
         {
-
-            alert(
-
-                "Debes iniciar sesión para realizar una compra."
-
+            mostrarMensaje(
+                "Debes iniciar sesión para realizar una compra.",
+                "warning"
             );
 
             navigate( "/login" );
 
             return;
-
         }
 
-
         navigate( "/checkout" );
-
     };
 
+    const esFormatoFisico = ( formato ) =>
+    {
+        return formato === "Fisico" || formato === "Físico";
+    };
 
     return (
 
         <main className="cart-page">
 
-
             <h1>
-
                 Carrito de compras
-
             </h1>
 
+            {cart.length === 0 ? (
 
-            {
+                <div className="empty-cart">
 
-                cart.length === 0
+                    <ShoppingCart size={ 80 } />
 
-                    ? (
+                    <h2>
+                        Tu carrito está vacío
+                    </h2>
 
-                        <div className="empty-cart">
+                    <p>
+                        Aún no tienes libros agregados.
+                        Explora nuestro catálogo y encuentra tu próxima lectura.
+                    </p>
 
-                            <ShoppingCart size={ 80 } />
+                    <button
+                        type="button"
+                        className="empty-cart-button"
+                        onClick={ () => navigate( "/catalogo" ) }
+                    >
+                        Ver catálogo
+                    </button>
 
-                            <h2>
-                                Tu carrito está vacío
-                            </h2>
+                </div>
 
-                            <p>
-                                Aún no tienes libros agregados.
-                                Explora nuestro catálogo y encuentra tu próxima lectura.
-                            </p>
+            ) : (
 
-                            <button
-                                className="empty-cart-button"
-                                onClick={ () => navigate( "/catalogo" ) }
-                            >
-                                Ver catálogo
-                            </button>
+                <div className="cart-container">
 
-                        </div>
+                    <section className="cart-products">
 
-                    )
+                        {cart.map( ( item ) =>
+                        {
+                            const formatoFisico = esFormatoFisico(
+                                item.formato
+                            );
 
-                    : (
+                            const precio = Number( item.precio );
+                            const cantidad = Number( item.quantity );
 
-                        <div className="cart-container">
+                            const subtotal = precio * cantidad;
 
+                            return (
 
-                            {/* Productos */ }
-                            <section className="cart-products">
+                                <article
+                                    className="cart-item"
+                                    key={`${ item.id }-${ item.formato }`}
+                                >
 
-                                {
+                                    <img
+                                        src={
+                                            item.imagen
+                                                ? `${UPLOADS_URL}/${ item.imagen }`
+                                                : "/images/default-book.jpg"
+                                        }
+                                        alt={`Portada de ${ item.titulo }`}
+                                    />
 
-                                    cart.map( ( item ) =>
+                                    <div className="cart-info">
 
-                                    (
+                                        <h3>
+                                            {item.titulo}
+                                        </h3>
 
-                                        <article
+                                        <p>
+                                            {item.autor}
+                                        </p>
 
-                                            className="cart-item"
+                                        <div className="cart-format">
 
-                                            key={
-
-                                                `${ item.id }-${ item.formato }`
-
+                                            {formatoFisico
+                                                ? <Package size={ 16 } />
+                                                : <Monitor size={ 16 } />
                                             }
 
-                                        >
-
-
-                                            {/* Imagen */ }
-                                            <img
-
-                                                src={ item.imagen }
-
-                                                alt={ item.titulo }
-
-                                            />
-
-
-                                            {/* Información */ }
-                                            <div className="cart-info">
-
-
-                                                <h3>
-
-                                                    { item.titulo }
-
-                                                </h3>
-
-
-                                                <p>
-
-                                                    { item.autor }
-
-                                                </p>
-
-
-                                                {/* Formato */ }
-                                                <div className="cart-format">
-
-                                                    {
-
-                                                        item.formato === "Virtual"
-
-                                                            ? (
-
-                                                                <Monitor
-
-                                                                    size={ 16 }
-
-                                                                />
-
-                                                            )
-
-                                                            : (
-
-                                                                <Package
-
-                                                                    size={ 16 }
-
-                                                                />
-
-                                                            )
-
-                                                    }
-
-
-                                                    <span>
-
-                                                        {
-
-                                                            item.formato === "Virtual"
-
-                                                                ? "Virtual"
-
-                                                                : "Físico"
-
-                                                        }
-
-                                                    </span>
-
-                                                </div>
-
-
-                                                {/* Precio */ }
-                                                <p className="unit-price">
-
-                                                    Precio unitario:
-
-                                                    <strong>
-
-                                                        $
-
-                                                        {
-
-                                                            item.precio.toLocaleString(
-
-                                                                "es-CO"
-
-                                                            )
-
-                                                        }
-
-                                                    </strong>
-
-                                                </p>
-
-
-                                                {/* Cantidad */ }
-
-                                                {
-
-                                                    item.formato === "Fisico"
-
-                                                        ? (
-
-                                                            <div className="quantity-control">
-
-                                                                <button
-
-                                                                    type="button"
-
-                                                                    onClick={ () =>
-
-                                                                        updateQuantity(
-
-                                                                            item.id,
-
-                                                                            item.quantity > 1
-
-                                                                                ? item.quantity - 1
-
-                                                                                : 1,
-
-                                                                            item.formato
-
-                                                                        )
-
-                                                                    }
-
-                                                                >
-
-                                                                    −
-
-                                                                </button>
-
-
-                                                                <strong>
-
-                                                                    { item.quantity }
-
-                                                                </strong>
-
-
-                                                                <button
-
-                                                                    type="button"
-
-                                                                    onClick={ () =>
-
-                                                                        updateQuantity(
-
-                                                                            item.id,
-
-                                                                            item.quantity + 1,
-
-                                                                            item.formato
-
-                                                                        )
-
-                                                                    }
-
-                                                                >
-
-                                                                    +
-
-                                                                </button>
-
-                                                            </div>
-
-                                                        )
-
-                                                        : (
-
-
-
-                                                            <div className="virtual-quantity">
-
-                                                                <span>
-
-                                                                    Cantidad: 1
-
-                                                                </span>
-
-                                                            </div>
-
-                                                        )
-
+                                            <span>
+                                                {formatoFisico
+                                                    ? "Físico"
+                                                    : "Virtual"
                                                 }
+                                            </span>
 
+                                        </div>
 
-                                                {/* Subtotal */ }
-                                                <p className="subtotal">
+                                        <p className="unit-price">
 
-                                                    Subtotal:
+                                            Precio unitario:
 
-                                                    <strong>
+                                            <strong>
+                                                ${precio.toLocaleString( "es-CO" )}
+                                            </strong>
 
-                                                        $
+                                        </p>
 
-                                                        {
+                                        {formatoFisico ? (
 
-                                                            (
+                                            <div className="quantity-control">
 
-                                                                item.precio *
-
-                                                                item.quantity
-
-                                                            ).toLocaleString(
-
-                                                                "es-CO"
-
-                                                            )
-
-                                                        }
-
-                                                    </strong>
-
-                                                </p>
-
-
-                                                {/* Eliminar */ }
                                                 <button
-
                                                     type="button"
-
-                                                    className="remove-button"
-
+                                                    aria-label={`Disminuir cantidad de ${ item.titulo }`}
                                                     onClick={ () =>
-
-                                                        removeFromCart(
-
+                                                        updateQuantity(
                                                             item.id,
-
+                                                            cantidad > 1
+                                                                ? cantidad - 1
+                                                                : 1,
                                                             item.formato
-
                                                         )
-
                                                     }
-
                                                 >
-
-                                                    <Trash2 size={ 17 } />
-
-                                                    Eliminar
-
+                                                    −
                                                 </button>
 
+                                                <strong>
+                                                    {cantidad}
+                                                </strong>
+
+                                                <button
+                                                    type="button"
+                                                    aria-label={`Aumentar cantidad de ${ item.titulo }`}
+                                                    onClick={ () =>
+                                                        updateQuantity(
+                                                            item.id,
+                                                            cantidad + 1,
+                                                            item.formato
+                                                        )
+                                                    }
+                                                >
+                                                    +
+                                                </button>
 
                                             </div>
 
-                                        </article>
+                                        ) : (
 
-                                    ) )
+                                            <div className="virtual-quantity">
+                                                <span>
+                                                    Cantidad: 1
+                                                </span>
+                                            </div>
 
-                                }
+                                        )}
 
-                            </section>
+                                        <p className="subtotal">
 
+                                            Subtotal:
 
-                            {/* Resumen */ }
-                            <aside className="cart-summary">
+                                            <strong>
+                                                ${subtotal.toLocaleString( "es-CO" )}
+                                            </strong>
 
+                                        </p>
 
-                                <h2>
+                                        <button
+                                            type="button"
+                                            className="remove-button"
+                                            onClick={ () =>
+                                                removeFromCart(
+                                                    item.id,
+                                                    item.formato
+                                                )
+                                            }
+                                        >
+                                            <Trash2 size={ 17 } />
+                                            Eliminar
+                                        </button>
 
-                                    Resumen de compra
+                                    </div>
 
-                                </h2>
+                                </article>
+                            );
+                        })}
 
+                    </section>
 
-                                <h3>
+                    <aside className="cart-summary">
 
-                                    Total:
+                        <h2>
+                            Resumen de compra
+                        </h2>
 
-                                    <strong>
+                        <h3>
 
-                                        $
+                            Total:
 
-                                        {
+                            <strong>
+                                ${total.toLocaleString( "es-CO" )}
+                            </strong>
 
-                                            total.toLocaleString(
+                        </h3>
 
-                                                "es-CO"
+                        <button
+                            type="button"
+                            className="buy-button"
+                            onClick={ finalizarCompra }
+                        >
+                            Continuar compra
+                        </button>
 
-                                            )
+                    </aside>
 
-                                        }
+                </div>
 
-                                    </strong>
-
-                                </h3>
-
-
-                                <button
-
-                                    type="button"
-
-                                    className="buy-button"
-
-                                    onClick={ finalizarCompra }
-
-                                >
-
-                                    Continuar compra
-
-                                </button>
-
-
-                            </aside>
-
-
-                        </div>
-
-                    )
-
-            }
-
+            )}
 
         </main>
-
     );
-
 }
-
 
 export default Cart;

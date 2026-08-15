@@ -1,6 +1,6 @@
 import "./Orders.css";
 
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import
 {
@@ -11,27 +11,107 @@ import
     ChevronUp,
     User,
     CreditCard,
-    Calendar
+    Calendar,
+    Download
 } from "lucide-react";
+
+import AuthContext from "../../context/AuthContext";
+import AlertContext from "../../context/AlertContext";
+import { API_URL, UPLOADS_URL, authFetch } from "../../config/api";
 
 
 // Página donde el usuario puede consultar sus pedidos.
 function Orders()
 {
 
-    const pedidos = JSON.parse(
+    const { usuario } = useContext( AuthContext );
 
-        localStorage.getItem("pedidos")
-
-    ) || [];
+    const { mostrarMensaje } = useContext( AlertContext );
 
 
-    // Controla qué pedido está abierto.
-    const [ pedidoAbierto, setPedidoAbierto ] = useState(null);
+    const [ pedidos, setPedidos ] = useState( [] );
+
+    const [ cargando, setCargando ] = useState( true );
+
+    const [ pedidoAbierto, setPedidoAbierto ] = useState( null );
+
+
+    // Carga los pedidos del usuario desde el backend.
+    useEffect( () =>
+    {
+
+        const cargarPedidos = async () =>
+        {
+
+            if ( !usuario )
+            {
+
+                setPedidos( [] );
+
+                setCargando( false );
+
+                return;
+
+            }
+
+
+            try
+            {
+
+                const respuesta = await authFetch(
+
+                    `${API_URL}/pedidos/usuario/${ usuario.id }`
+
+                );
+
+
+                if ( !respuesta.ok )
+                {
+
+                    throw new Error(
+                        "No fue posible cargar los pedidos."
+                    );
+
+                }
+
+
+                const datos = await respuesta.json();
+
+
+                setPedidos( datos );
+
+            }
+            catch ( error )
+            {
+
+                console.error( error );
+
+                mostrarMensaje(
+
+                    "No fue posible cargar tus pedidos.",
+
+                    "error"
+
+                );
+
+            }
+            finally
+            {
+
+                setCargando( false );
+
+            }
+
+        };
+
+
+        cargarPedidos();
+
+    }, [ usuario, mostrarMensaje ] );
 
 
     // Abre o cierra los detalles de un pedido.
-    const togglePedido = (id) =>
+    const togglePedido = ( id ) =>
     {
 
         setPedidoAbierto(
@@ -47,6 +127,137 @@ function Orders()
     };
 
 
+    // Descarga un libro digital comprado.
+    const descargarLibro = async ( libroId, titulo ) =>
+    {
+
+        try
+        {
+
+            const respuesta = await authFetch(
+                `${API_URL}/libros/${ libroId }/descargar`
+            );
+
+            if ( !respuesta.ok )
+            {
+
+                const mensaje = await respuesta.text();
+
+                throw new Error( mensaje );
+
+            }
+
+            const blob = await respuesta.blob();
+
+            // Usa el nombre original subido (lo devuelve el backend).
+            const nombreDescarga =
+                respuesta.headers.get( "X-File-Name" ) ||
+                `${ titulo }.pdf`;
+
+            const url = URL.createObjectURL( blob );
+
+            const enlace = document.createElement( "a" );
+
+            enlace.href = url;
+
+            enlace.download = nombreDescarga;
+
+            document.body.appendChild( enlace );
+
+            enlace.click();
+
+            document.body.removeChild( enlace );
+
+            URL.revokeObjectURL( url );
+
+            mostrarMensaje(
+                `Descarga iniciada: ${ titulo }`,
+                "success"
+            );
+
+        }
+        catch ( error )
+        {
+
+            console.error( error );
+
+            mostrarMensaje(
+                error.message,
+                "error"
+            );
+
+        }
+
+    };
+
+
+    // Muestra la fecha de forma más sencilla.
+    const mostrarFecha = ( fecha ) =>
+    {
+        if ( !fecha )
+        {
+
+            return "Fecha no disponible";
+
+        }
+
+
+        const fechaPedido = new Date( fecha );
+
+
+        return fechaPedido.toLocaleString(
+
+            "es-CO",
+
+            {
+
+                dateStyle: "short",
+
+                timeStyle: "short"
+
+            }
+
+        );
+
+    };
+
+
+    if ( cargando )
+    {
+
+        return (
+
+            <main className="orders-page">
+
+                <section className="orders-card">
+
+                    <div className="orders-empty">
+
+                        <Package size={ 55 } />
+
+                        <h2>
+
+                            Cargando pedidos...
+
+                        </h2>
+
+                        <p>
+
+                            Estamos consultando tus compras.
+
+                        </p>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+        );
+
+    }
+
+
     return (
 
         <main className="orders-page">
@@ -54,10 +265,10 @@ function Orders()
             <section className="orders-card">
 
 
-                {/* Encabezado de la página */}
+                {/* Encabezado de la página */ }
                 <div className="orders-header">
 
-                    <Package size={32} />
+                    <Package size={ 32 } />
 
                     <div>
 
@@ -80,14 +291,13 @@ function Orders()
 
                 {
 
-                    // Mensaje cuando no existen pedidos.
                     pedidos.length === 0
 
                         ? (
 
                             <div className="orders-empty">
 
-                                <ShoppingBag size={55} />
+                                <ShoppingBag size={ 55 } />
 
                                 <h2>
 
@@ -108,422 +318,565 @@ function Orders()
 
                         : (
 
-                            // Lista de pedidos realizados.
                             <div className="orders-list">
 
                                 {
 
-                                    pedidos.map((pedido) =>
+                                    pedidos.map( ( pedido ) =>
+                                    {
 
-                                    (
+                                        const detalles =
 
-                                        <article
-
-                                            className="order-item"
-
-                                            key={pedido.id}
-
-                                        >
+                                            pedido.productos || [];
 
 
-                                            {/* Encabezado del pedido */}
-                                            <div className="order-top">
+                                        return (
 
-                                                <div className="order-info">
+                                            <article
 
-                                                    <strong>
+                                                className="order-item"
 
-                                                        Pedido #{pedido.id}
+                                                key={ pedido.id }
 
-                                                    </strong>
+                                            >
 
 
-                                                    <span>
+                                                {/* Encabezado del pedido */ }
+                                                <div className="order-top">
 
-                                                        <Calendar size={14} />
+                                                    <div className="order-info">
 
-                                                        {pedido.fecha}
+                                                        <strong>
 
-                                                    </span>
+                                                            Pedido #{ pedido.id }
+
+                                                        </strong>
+
+
+                                                        <span>
+
+                                                            <Calendar size={ 14 } />
+
+                                                            {
+
+                                                                mostrarFecha(
+
+                                                                    pedido.fecha
+
+                                                                )
+
+                                                            }
+
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <div className="order-header-right">
+
+                                                        <span
+                                                            className={ `order-status estado-${ pedido.estado
+                                                                ?.toLowerCase()
+                                                                .replaceAll( " ", "-" ) }` }
+                                                        >
+                                                            { pedido.estado || "Pendiente" }
+                                                        </span>
+
+
+                                                        <button
+
+                                                            type="button"
+
+                                                            className="details-button"
+
+                                                            onClick={ () =>
+
+                                                                togglePedido(
+
+                                                                    pedido.id
+
+                                                                )
+
+                                                            }
+
+                                                        >
+
+                                                            {
+
+                                                                pedidoAbierto === pedido.id
+
+                                                                    ? (
+
+                                                                        <>
+
+                                                                            Ocultar detalles
+
+                                                                            <ChevronUp size={ 18 } />
+
+                                                                        </>
+
+                                                                    )
+
+                                                                    : (
+
+                                                                        <>
+
+                                                                            Ver detalles
+
+                                                                            <ChevronDown size={ 18 } />
+
+                                                                        </>
+
+                                                                    )
+
+                                                            }
+
+                                                        </button>
+
+                                                    </div>
 
                                                 </div>
 
 
-                                                <div className="order-header-right">
+                                                {/* Resumen rápido del pedido */ }
+                                                <div className="order-total-preview">
 
-                                                    {/* Estado del pedido */}
-                                                    <span className="order-status">
+                                                    <span>
 
-                                                        {pedido.estado}
+                                                        {
+
+                                                            detalles.length
+
+                                                        }
+
+                                                        {
+
+                                                            detalles.length === 1
+
+                                                                ? " producto"
+
+                                                                : " productos"
+
+                                                        }
 
                                                     </span>
 
 
-                                                    {/* Botón para mostrar los detalles */}
-                                                    <button
+                                                    <strong>
 
-                                                        type="button"
+                                                        $
 
-                                                        className="details-button"
+                                                        {
 
-                                                        onClick={() =>
+                                                            (
 
-                                                            togglePedido(
+                                                                pedido.total || 0
 
-                                                                pedido.id
+                                                            ).toLocaleString(
+
+                                                                "es-CO"
 
                                                             )
 
                                                         }
 
-                                                    >
-
-                                                        {
-
-                                                            pedidoAbierto === pedido.id
-
-                                                                ? (
-
-                                                                    <>
-
-                                                                        Ocultar detalles
-
-                                                                        <ChevronUp size={18} />
-
-                                                                    </>
-
-                                                                )
-
-                                                                : (
-
-                                                                    <>
-
-                                                                        Ver detalles
-
-                                                                        <ChevronDown size={18} />
-
-                                                                    </>
-
-                                                                )
-
-                                                        }
-
-                                                    </button>
+                                                    </strong>
 
                                                 </div>
 
-                                            </div>
 
+                                                {
 
-                                            {/* Resumen rápido del pedido */}
-                                            <div className="order-total-preview">
+                                                    pedidoAbierto === pedido.id &&
 
-                                                <span>
+                                                    (
 
-                                                    {
+                                                        <div className="order-details">
 
-                                                        pedido.productos.length
 
-                                                    }
+                                                            {/* Datos del comprador */ }
+                                                            <div className="order-user">
 
-                                                    {
+                                                                <h3>
 
-                                                        pedido.productos.length === 1
+                                                                    <User size={ 18 } />
 
-                                                            ? " producto"
+                                                                    Datos del comprador
 
-                                                            : " productos"
+                                                                </h3>
 
-                                                    }
 
-                                                </span>
+                                                                <div className="order-user-grid">
 
+                                                                    <p>
 
-                                                <strong>
+                                                                        <strong>
 
-                                                    $
+                                                                            Nombre:
 
-                                                    {
-
-                                                        pedido.total.toLocaleString(
-
-                                                            "es-CO"
-
-                                                        )
-
-                                                    }
-
-                                                </strong>
-
-                                            </div>
-
-
-                                            {
-
-                                                // Detalles del pedido seleccionado.
-                                                pedidoAbierto === pedido.id &&
-
-                                                (
-
-                                                    <div className="order-details">
-
-
-                                                        {/* Datos del comprador */}
-                                                        <div className="order-user">
-
-                                                            <h3>
-
-                                                                <User size={18} />
-
-                                                                Datos del comprador
-
-                                                            </h3>
-
-
-                                                            <div className="order-user-grid">
-
-                                                                <p>
-
-                                                                    <strong>
-
-                                                                        Nombre:
-
-                                                                    </strong>
-
-                                                                    {
-
-                                                                        pedido.usuario?.nombre ||
-
-                                                                        "No disponible"
-
-                                                                    }
-
-                                                                </p>
-
-
-                                                                <p>
-
-                                                                    <strong>
-
-                                                                        Correo:
-
-                                                                    </strong>
-
-                                                                    {
-
-                                                                        pedido.usuario?.correo ||
-
-                                                                        "No disponible"
-
-                                                                    }
-
-                                                                </p>
-
-
-                                                                <p>
-
-                                                                    <strong>
-
-                                                                        Teléfono:
-
-                                                                    </strong>
-
-                                                                    {
-
-                                                                        pedido.usuario?.telefono ||
-
-                                                                        "No disponible"
-
-                                                                    }
-
-                                                                </p>
-
-
-                                                                <p>
-
-                                                                    <strong>
-
-                                                                        Ciudad:
-
-                                                                    </strong>
-
-                                                                    {
-
-                                                                        pedido.usuario?.ciudad ||
-
-                                                                        "No disponible"
-
-                                                                    }
-
-                                                                </p>
-
-
-                                                                <p className="full-width">
-
-                                                                    <strong>
-
-                                                                        Dirección:
-
-                                                                    </strong>
-
-                                                                    {
-
-                                                                        pedido.usuario?.direccion ||
-
-                                                                        "No disponible"
-
-                                                                    }
-
-                                                                </p>
-
-                                                            </div>
-
-                                                        </div>
-
-
-                                                        {/* Método de pago */}
-                                                        <div className="payment-info">
-
-                                                            <CreditCard size={18} />
-
-                                                            <span>
-
-                                                                Método de pago:
-
-                                                            </span>
-
-                                                            <strong>
-
-                                                                {
-
-                                                                    pedido.metodoPago ||
-
-                                                                    "No especificado"
-
-                                                                }
-
-                                                            </strong>
-
-                                                        </div>
-
-
-                                                        {/* Productos del pedido */}
-                                                        <div className="order-products">
-
-                                                            <h3>
-
-                                                                Productos
-
-                                                            </h3>
-
-
-                                                            <div className="order-products-list">
-
-                                                                {
-
-                                                                    pedido.productos.map(
-
-                                                                        (producto, index) =>
+                                                                        </strong>
 
                                                                         {
 
-                                                                            const esVirtual =
+                                                                            pedido.nombreUsuario ||
 
-                                                                                producto.formato === "Virtual";
+                                                                            "No disponible"
 
+                                                                        }
 
-                                                                            return (
-
-                                                                                <div
-
-                                                                                    className="order-product"
-
-                                                                                    key={
-
-                                                                                        `${producto.id}-${producto.formato}-${index}`
-
-                                                                                    }
-
-                                                                                >
+                                                                    </p>
 
 
-                                                                                    {/* Imagen del producto */}
-                                                                                    <img
+                                                                    <p>
 
-                                                                                        src={producto.imagen}
+                                                                        <strong>
 
-                                                                                        alt={producto.titulo}
+                                                                            Correo:
 
-                                                                                    />
+                                                                        </strong>
 
+                                                                        {
 
-                                                                                    {/* Información del producto */}
-                                                                                    <div className="order-product-info">
+                                                                            pedido.correoUsuario ||
 
-                                                                                        <strong>
+                                                                            "No disponible"
 
-                                                                                            {producto.titulo}
+                                                                        }
 
-                                                                                        </strong>
-
-
-                                                                                        {/* Formato */}
-                                                                                        <span className="order-format">
-
-                                                                                            {
-
-                                                                                                esVirtual
-
-                                                                                                    ? (
-
-                                                                                                        <Monitor size={15} />
-
-                                                                                                    )
-
-                                                                                                    : (
-
-                                                                                                        <Package size={15} />
-
-                                                                                                    )
-
-                                                                                            }
+                                                                    </p>
 
 
-                                                                                            {
+                                                                    <p>
 
-                                                                                                esVirtual
+                                                                        <strong>
 
-                                                                                                    ? "Virtual"
+                                                                            Teléfono:
 
-                                                                                                    : "Físico"
+                                                                        </strong>
 
-                                                                                            }
+                                                                        {
 
-                                                                                        </span>
+                                                                            pedido.telefono ||
+
+                                                                            "No disponible"
+
+                                                                        }
+
+                                                                    </p>
 
 
-                                                                                        {
+                                                                    <p>
 
-                                                                                            !esVirtual && (
+                                                                        <strong>
 
-                                                                                                <span>
+                                                                            Ciudad:
 
-                                                                                                    Cantidad: {producto.quantity}
+                                                                        </strong>
 
-                                                                                                </span>
+                                                                        {
 
-                                                                                            )
+                                                                            pedido.ciudad ||
+
+                                                                            "No disponible"
+
+                                                                        }
+
+                                                                    </p>
+
+
+                                                                    <p className="full-width">
+
+                                                                        <strong>
+
+                                                                            Dirección:
+
+                                                                        </strong>
+
+                                                                        {
+
+                                                                            pedido.direccion ||
+
+                                                                            "No disponible"
+
+                                                                        }
+
+                                                                    </p>
+
+                                                                </div>
+
+                                                            </div>
+
+
+                                                            {/* Método de pago */ }
+                                                            <div className="payment-info">
+
+                                                                <CreditCard size={ 18 } />
+
+                                                                <span>
+
+                                                                    Método de pago:
+
+                                                                </span>
+
+                                                                <strong>
+
+                                                                    {
+
+                                                                        pedido.metodoPago ||
+
+                                                                        "No especificado"
+
+                                                                    }
+
+                                                                </strong>
+
+                                                                <span
+
+                                                                    className={ `pago-badge ${
+
+                                                                        pedido.estadoPago === "Pagado"
+
+                                                                            ? "pagado"
+
+                                                                            : "pendiente"
+
+                                                                    }` }
+
+                                                                >
+
+                                                                    {
+
+                                                                        pedido.estadoPago ||
+
+                                                                        "Pendiente"
+
+                                                                    }
+
+                                                                </span>
+
+                                                            </div>
+
+
+                                                            {/* Productos del pedido */ }
+                                                            <div className="order-products">
+
+                                                                <h3>
+
+                                                                    Productos
+
+                                                                </h3>
+
+
+                                                                <div className="order-products-list">
+
+                                                                    {
+
+                                                                        detalles.map(
+
+                                                                            ( detalle, index ) =>
+                                                                            {
+
+                                                                                const esVirtual =
+
+                                                                                    detalle.formato ===
+
+                                                                                    "Virtual";
+
+
+                                                                                const precio =
+
+                                                                                    detalle.precio ||
+
+                                                                                    0;
+
+
+                                                                                const cantidad =
+
+                                                                                    detalle.cantidad ||
+
+                                                                                    1;
+
+
+                                                                                return (
+
+                                                                                    <div
+
+                                                                                        className="order-product"
+
+                                                                                        key={
+
+                                                                                            `${ detalle.id }-${ index }`
 
                                                                                         }
 
+                                                                                    >
 
-                                                                                        <span>
 
-                                                                                            Precio unitario: $
+                                                                                        {/* Imagen del producto */ }
+                                                                                        <img
+
+                                                                                            src={
+                                                                                                detalle.imagen
+                                                                                                    ? `${UPLOADS_URL}/${ detalle.imagen }`
+                                                                                                    : "/images/default-book.jpg"
+                                                                                            }
+
+                                                                                            alt={ detalle.titulo }
+
+
+                                                                                            onError={ ( e ) =>
+                                                                                            {
+
+                                                                                                e.currentTarget.src =
+
+                                                                                                    "/images/default-book.jpg";
+
+                                                                                            } }
+
+                                                                                        />
+
+
+                                                                                        {/* Información del producto */ }
+                                                                                        <div className="order-product-info">
+
+                                                                                            <strong>
+
+                                                                                                {
+
+                                                                                                    detalle.titulo ||
+
+                                                                                                    "Libro no disponible"
+
+                                                                                                }
+
+                                                                                            </strong>
+
+
+                                                                                            <span className="order-format">
+
+                                                                                                {
+
+                                                                                                    esVirtual
+
+                                                                                                        ? (
+
+                                                                                                            <Monitor size={ 15 } />
+
+                                                                                                        )
+
+                                                                                                        : (
+
+                                                                                                            <Package size={ 15 } />
+
+                                                                                                        )
+
+                                                                                                }
+
+
+                                                                                                {
+
+                                                                                                    esVirtual
+
+                                                                                                        ? "Virtual"
+
+                                                                                                        : "Físico"
+
+                                                                                                }
+
+                                                                                            </span>
+
 
                                                                                             {
 
-                                                                                                producto.precio.toLocaleString(
+                                                                                                !esVirtual &&
+
+                                                                                                (
+
+                                                                                                    <span>
+
+                                                                                                        Cantidad: { cantidad }
+
+                                                                                                    </span>
+
+                                                                                                )
+
+                                                                                            }
+
+
+                                                                                            {
+
+                                                                                                esVirtual &&
+
+                                                                                                detalle.tieneArchivo &&
+
+                                                                                                pedido.estadoPago === "Pagado" &&
+
+                                                                                                (
+
+                                                                                                    <button
+
+                                                                                                        type="button"
+
+                                                                                                        className="download-button"
+
+                                                                                                        onClick={ () =>
+
+                                                                                                            descargarLibro(
+
+                                                                                                                detalle.id,
+
+                                                                                                                detalle.titulo
+
+                                                                                                            )
+
+                                                                                                        }
+
+                                                                                                    >
+
+                                                                                                        <Download size={ 15 } />
+
+                                                                                                        Descargar
+
+                                                                                                    </button>
+
+                                                                                                )
+
+                                                                                            }
+
+
+                                                                                            <span>
+
+                                                                                                Precio unitario: $
+
+                                                                                                {
+
+                                                                                                    precio.toLocaleString(
+
+                                                                                                        "es-CO"
+
+                                                                                                    )
+
+                                                                                                }
+
+                                                                                            </span>
+
+                                                                                        </div>
+
+
+                                                                                        {/* Subtotal del producto */ }
+                                                                                        <strong className="order-product-price">
+
+                                                                                            $
+
+                                                                                            {
+
+                                                                                                (
+
+                                                                                                    precio *
+
+                                                                                                    cantidad
+
+                                                                                                ).toLocaleString(
 
                                                                                                     "es-CO"
 
@@ -531,88 +884,68 @@ function Orders()
 
                                                                                             }
 
-                                                                                        </span>
+                                                                                        </strong>
 
                                                                                     </div>
 
+                                                                                );
 
-                                                                                    {/* Subtotal del producto */}
-                                                                                    <strong className="order-product-price">
+                                                                            }
 
-                                                                                        $
+                                                                        )
 
-                                                                                        {
+                                                                    }
 
-                                                                                            (
+                                                                </div>
 
-                                                                                                producto.precio *
+                                                            </div>
 
-                                                                                                producto.quantity
 
-                                                                                            ).toLocaleString(
+                                                            {/* Total del pedido */ }
+                                                            <div className="order-total">
 
-                                                                                                "es-CO"
+                                                                <span>
 
-                                                                                            )
+                                                                    Total del pedido
 
-                                                                                        }
+                                                                </span>
 
-                                                                                    </strong>
 
-                                                                                </div>
+                                                                <strong>
 
-                                                                            );
+                                                                    $
 
-                                                                        }
+                                                                    {
 
-                                                                    )
+                                                                        (
 
-                                                                }
+                                                                            pedido.total || 0
+
+                                                                        ).toLocaleString(
+
+                                                                            "es-CO"
+
+                                                                        )
+
+                                                                    }
+
+                                                                </strong>
 
                                                             </div>
 
                                                         </div>
 
+                                                    )
 
-                                                        {/* Total del pedido */}
-                                                        <div className="order-total">
+                                                }
 
-                                                            <span>
+                                            </article>
 
-                                                                Total del pedido
+                                        );
 
-                                                            </span>
+                                    } )
 
-
-                                                            <strong>
-
-                                                                $
-
-                                                                {
-
-                                                                    pedido.total.toLocaleString(
-
-                                                                        "es-CO"
-
-                                                                    )
-
-                                                                }
-
-                                                            </strong>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                )
-
-                                            }
-
-                                        </article>
-
-                                    )
-
-                                )}
+                                }
 
                             </div>
 

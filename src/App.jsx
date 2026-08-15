@@ -10,7 +10,6 @@ import
     Navigate
 } from "react-router-dom";
 
-import CartContext from "./context/CartContext";
 
 import AuthContext from "./context/AuthContext";
 
@@ -36,6 +35,8 @@ import Profile from "./pages/Profile/Profile";
 
 import Orders from "./pages/Orders/Orders";
 
+import MisLibros from "./pages/MisLibros/MisLibros";
+
 import Checkout from "./pages/Checkout/Checkout";
 
 import Admin from "./pages/admin/Admin";
@@ -48,9 +49,15 @@ import PedidosAdmin from "./pages/admin/PedidosAdmin";
 
 import UsuariosAdmin from "./pages/admin/UsuariosAdmin";
 
-import VentasAdmin from "./pages/admin/VentasAdmin";
+import CategoriasAdmin from "./pages/admin/CategoriasAdmin";
 
 import Project from "./pages/project/Project";
+
+import Confirmacion from "./pages/Confirmacion/Confirmacion";
+
+import Recuperar from "./pages/Recuperar/Recuperar";
+
+import Alert from "./components/Alert/Alert";
 
 
 
@@ -112,7 +119,7 @@ function RutaAdmin( { children } )
     }
 
 
-    if ( usuario.rol !== "admin" )
+    if ( usuario.rol !== "administrador" )
     {
 
         return (
@@ -171,53 +178,26 @@ function RutaPublicaAuth( { children } )
 function App()
 {
 
-    const { showMessage } = useContext( CartContext );
-
-
     return (
 
         <BrowserRouter>
 
             <Navbar />
 
-
-            {
-                showMessage && (
-
-                    <div className="cart-toast">
-
-                        ✔ Libro agregado al carrito
-
-                    </div>
-
-                )
-            }
-
-
+            <Alert />
 
             <Routes>
 
-
                 {/* Página principal */ }
-
                 <Route
-
                     path="/"
-
                     element={ <Home /> }
-
                 />
 
-
-
                 {/* Catálogo */ }
-
                 <Route
-
                     path="/catalogo"
-
                     element={ <Catalog /> }
-
                 />
 
                 {/* Contacto */ }
@@ -232,203 +212,136 @@ function App()
                     element={ <Project /> }
                 />
 
-
                 {/* Detalle del libro */ }
-
                 <Route
-
                     path="/libro/:id"
-
                     element={ <BookDetail /> }
-
                 />
-
-
 
                 {/* Carrito */ }
-
                 <Route
-
                     path="/carrito"
-
                     element={ <Cart /> }
-
                 />
-
-
 
                 {/* Login */ }
-
                 <Route
-
                     path="/login"
-
                     element={
-
                         <RutaPublicaAuth>
-
                             <Login />
-
                         </RutaPublicaAuth>
-
                     }
-
                 />
-
-
 
                 {/* Registro */ }
-
                 <Route
-
                     path="/registro"
-
                     element={
-
                         <RutaPublicaAuth>
-
                             <Register />
-
                         </RutaPublicaAuth>
-
                     }
-
                 />
 
+                {/* Recuperar contraseña */ }
+                <Route
+                    path="/recuperar"
+                    element={
+                        <RutaPublicaAuth>
+                            <Recuperar />
+                        </RutaPublicaAuth>
+                    }
+                />
 
+                {/* Confirmación de compra */ }
+                <Route
+                    path="/confirmacion/:id"
+                    element={
+                        <RutaProtegida>
+                            <Confirmacion />
+                        </RutaProtegida>
+                    }
+                />
 
                 {/* Perfil */ }
-
                 <Route
-
                     path="/perfil"
-
                     element={
-
                         <RutaProtegida>
-
                             <Profile />
-
                         </RutaProtegida>
-
                     }
-
                 />
-
-
 
                 {/* Pedidos */ }
-
                 <Route
-
                     path="/pedidos"
-
                     element={
-
                         <RutaProtegida>
-
                             <Orders />
-
                         </RutaProtegida>
-
                     }
-
                 />
 
-
+                {/* Mis libros */ }
+                <Route
+                    path="/mis-libros"
+                    element={
+                        <RutaProtegida>
+                            <MisLibros />
+                        </RutaProtegida>
+                    }
+                />
 
                 {/* Checkout */ }
-
                 <Route
-
                     path="/checkout"
-
                     element={
-
                         <RutaProtegida>
-
                             <Checkout />
-
                         </RutaProtegida>
-
                     }
-
                 />
 
-
-
                 {/* Panel administrativo */ }
-
                 <Route
-
                     path="/admin"
-
                     element={
-
                         <RutaAdmin>
-
                             <Admin />
-
                         </RutaAdmin>
-
                     }
-
                 >
 
-
                     <Route
-
                         index
-
                         element={ <Dashboard /> }
-
                     />
 
-
                     <Route
-
                         path="libros"
-
                         element={ <LibrosAdmin /> }
-
                     />
 
-
                     <Route
-
                         path="pedidos"
-
                         element={ <PedidosAdmin /> }
-
                     />
 
-
                     <Route
-
                         path="usuarios"
-
                         element={ <UsuariosAdmin /> }
-
                     />
-
 
                     <Route
-
-                        path="ventas"
-
-                        element={ <VentasAdmin /> }
-
+                        path="categorias"
+                        element={ <CategoriasAdmin /> }
                     />
-
-
-
 
                 </Route>
 
-
-
             </Routes>
-
 
             <Footer />
 

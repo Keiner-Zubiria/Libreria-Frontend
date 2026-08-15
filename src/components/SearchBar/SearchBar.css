@@ -15,9 +15,13 @@
 
     font-size: 16px;
 
-    border: 1px solid #D1D5DB;
+    border: 1px solid var(--color-borde);
 
     border-radius: 12px;
+
+    background: var(--color-entrada);
+
+    color: var(--color-texto);
 
     outline: none;
 

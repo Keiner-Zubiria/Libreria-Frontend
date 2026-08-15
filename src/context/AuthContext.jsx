@@ -25,66 +25,17 @@ function AuthProvider( { children } )
     } );
 
 
+    // Guarda el token de acceso recibido del backend.
+    const [ token, setToken ] = useState( () =>
 
-    // Crea automáticamente la cuenta de administrador.
-    const crearAdministrador = () =>
-    {
+        localStorage.getItem( "tokenActivo" ) || null
 
-        const usuarios = JSON.parse(
-
-            localStorage.getItem( "usuarios" )
-
-        ) || [];
-
-
-        const existeAdmin = usuarios.some(
-
-            ( usuario ) =>
-
-                usuario.rol === "admin"
-
-        );
-
-
-        if ( !existeAdmin )
-        {
-
-            const administrador = {
-
-                nombre: "Administrador",
-
-                correo: "admin@gmail.com",
-
-                password: "admin",
-
-                rol: "admin"
-
-            };
-
-
-            usuarios.push( administrador );
-
-
-            localStorage.setItem(
-
-                "usuarios",
-
-                JSON.stringify( usuarios )
-
-            );
-
-        }
-
-    };
-
-
-    // Crea la cuenta admin al iniciar el contexto.
-    crearAdministrador();
+    );
 
 
 
-    // Inicia sesión con un usuario.
-    const login = ( usuario ) =>
+    // Inicia sesión con el token y el usuario recibidos del backend.
+    const login = ( token, usuario ) =>
     {
 
         const usuarioSesion = {
@@ -105,8 +56,18 @@ function AuthProvider( { children } )
 
         );
 
+        localStorage.setItem(
+
+            "tokenActivo",
+
+            token
+
+        );
+
 
         setUsuario( usuarioSesion );
+
+        setToken( token );
 
     };
 
@@ -146,8 +107,12 @@ function AuthProvider( { children } )
 
         localStorage.removeItem( "usuarioActivo" );
 
+        localStorage.removeItem( "tokenActivo" );
+
 
         setUsuario( null );
+
+        setToken( null );
 
     };
 
@@ -162,6 +127,8 @@ function AuthProvider( { children } )
                 {
 
                     usuario,
+
+                    token,
 
                     login,
 

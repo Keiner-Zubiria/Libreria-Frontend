@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 
+
 // Contexto global del carrito.
 const CartContext = createContext();
 
@@ -12,8 +13,6 @@ function CartProvider({ children }) {
         return savedCart ? JSON.parse(savedCart) : [];
 
     });
-
-    const [showMessage, setShowMessage] = useState(false);
 
 
     // Guarda automáticamente el carrito en el navegador.
@@ -31,9 +30,15 @@ function CartProvider({ children }) {
 
 
     // Agrega un libro al carrito.
+    // Devuelve true si se agregó y false si no fue posible.
     const addToCart = (book) => {
 
-        const quantity = book.quantity || 1;
+        // Un libro virtual solo se compra una vez.
+        const esVirtual = book.formato === "Virtual";
+
+        const quantity = esVirtual
+            ? 1
+            : (book.quantity || 1);
 
 
         // El libro y el formato identifican el producto.
@@ -51,6 +56,14 @@ function CartProvider({ children }) {
 
         if (existingBook) {
 
+            // Si el libro virtual ya está en el carrito, no se agrega de nuevo.
+            if (esVirtual) {
+
+                return false;
+
+            }
+
+
             setCart(
 
                 cart.map((item) =>
@@ -63,7 +76,13 @@ function CartProvider({ children }) {
 
                             ...item,
 
-                            quantity: item.quantity + quantity
+                            quantity: Math.min(
+
+                                item.quantity + quantity,
+
+                                item.stock || Infinity
+
+                            )
 
                         }
 
@@ -73,35 +92,31 @@ function CartProvider({ children }) {
 
             );
 
-        }
-
-        else {
-
-            setCart([
-
-                ...cart,
-
-                {
-
-                    ...book,
-
-                    quantity
-
-                }
-
-            ]);
+            return true;
 
         }
 
+        setCart([
 
-        // Mostrar mensaje de confirmación.
-        setShowMessage(true);
+            ...cart,
 
-        setTimeout(() => {
+            {
 
-            setShowMessage(false);
+                ...book,
 
-        }, 2000);
+                quantity: Math.min(
+
+                    quantity,
+
+                    book.stock || Infinity
+
+                )
+
+            }
+
+        ]);
+
+        return true;
 
     };
 
@@ -179,8 +194,7 @@ function CartProvider({ children }) {
                 updateQuantity,
 
                 clearCart,
-
-                showMessage
+   
 
             }}
 

@@ -5,7 +5,7 @@ import
     BookOpen,
     Package,
     Users,
-    DollarSign
+    Tag
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
@@ -20,7 +20,7 @@ function Dashboard()
         <div className="dashboard">
 
 
-            {/* Encabezado del dashboard */}
+            {/* Encabezado del dashboard */ }
             <div className="admin-header">
 
                 <h1>
@@ -36,7 +36,7 @@ function Dashboard()
 
 
 
-            {/* Accesos rápidos */}
+            {/* Accesos rápidos */ }
             <div className="admin-cards">
 
 
@@ -45,7 +45,7 @@ function Dashboard()
                     className="admin-card"
                 >
 
-                    <BookOpen size={32}/>
+                    <BookOpen size={ 32 } />
 
                     <div>
 
@@ -75,7 +75,7 @@ function Dashboard()
                     className="admin-card"
                 >
 
-                    <Package size={32}/>
+                    <Package size={ 32 } />
 
                     <div>
 
@@ -105,7 +105,7 @@ function Dashboard()
                     className="admin-card"
                 >
 
-                    <Users size={32}/>
+                    <Users size={ 32 } />
 
                     <div>
 
@@ -131,25 +131,25 @@ function Dashboard()
 
 
                 <Link
-                    to="/admin/ventas"
+                    to="/admin/categorias"
                     className="admin-card"
                 >
 
-                    <DollarSign size={32}/>
+                    <Tag size={ 32 } />
 
                     <div>
 
                         <h2>
-                            Ventas
+                            Categorias
                         </h2>
 
                         <span>
-                            Ver ingresos
+                            Organiza categorias
                         </span>
 
                         <p>
-                            Revisa información sobre ventas
-                            y movimientos de la librería.
+                            Crea, edita y administra las categorías
+                            de los libros de la librería.
                         </p>
 
                     </div>

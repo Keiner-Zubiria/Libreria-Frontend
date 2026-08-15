@@ -19,15 +19,17 @@
 
     max-width: 420px;
 
-    background: white;
+    background: var(--color-superficie);
 
     border-radius: 18px;
 
     padding: 40px;
 
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    box-shadow: var(--color-sombra);
 
-    border: 1px solid #E5E7EB;
+    border: 1px solid var(--color-borde);
+
+    transition: background-color .3s ease, border-color .3s ease;
 
 }
 
@@ -49,7 +51,7 @@
 
     text-align: center;
 
-    color: #111827;
+    color: var(--color-texto);
 
     margin-bottom: 35px;
 
@@ -77,7 +79,7 @@
 
     gap: 12px;
 
-    border: 1px solid #D1D5DB;
+    border: 1px solid var(--color-borde);
 
     border-radius: 10px;
 
@@ -99,7 +101,7 @@
 
 .input-group svg {
 
-    color: #6B7280;
+    color: var(--color-texto-suave);
 
     flex-shrink: 0;
 
@@ -119,6 +121,8 @@
     font-family: inherit;
 
     background: transparent;
+
+    color: var(--color-texto);
 
 }
 
@@ -159,7 +163,7 @@
 
     margin-top: 30px;
 
-    color: #6B7280;
+    color: var(--color-texto-suave);
 
 }
 
@@ -181,6 +185,32 @@
 
 }
 
+.login-recuperar {
+
+    text-align: center;
+
+    margin-top: 18px;
+
+}
+
+.login-recuperar a {
+
+    color: var(--color-texto-suave);
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+}
+
+.login-recuperar a:hover {
+
+    color: #2563EB;
+
+    text-decoration: underline;
+
+}
+
 
 @media (max-width: 480px) {
 
@@ -190,4 +220,25 @@
 
     }
 
+}
+
+
+.password-group {
+    position: relative;
+}
+
+.password-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-texto-suave);
+    cursor: pointer;
+}
+
+.password-toggle:hover {
+    color: #2563EB;
 }

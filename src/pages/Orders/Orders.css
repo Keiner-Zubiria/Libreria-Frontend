@@ -4,18 +4,19 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background: #f8fafc;
+    background: var(--color-fondo);
 }
 
 .orders-card {
     width: 100%;
     max-width: 900px;
     box-sizing: border-box;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: var(--color-superficie);
+    border: 1px solid var(--color-borde);
     border-radius: 18px;
     padding: 35px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--color-sombra);
+    transition: background-color .3s ease, border-color .3s ease;
 }
 
 /* Encabezado */
@@ -25,7 +26,7 @@
     align-items: center;
     gap: 15px;
     padding-bottom: 25px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--color-borde);
 }
 
 .orders-header svg {
@@ -35,13 +36,13 @@
 
 .orders-header h1 {
     margin: 0;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 28px;
 }
 
 .orders-header p {
     margin: 5px 0 0;
-    color: #6b7280;
+    color: var(--color-texto-suave);
     font-size: 14px;
 }
 
@@ -62,13 +63,13 @@
 
 .orders-empty h2 {
     margin: 0;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 20px;
 }
 
 .orders-empty p {
     margin-top: 8px;
-    color: #6b7280;
+    color: var(--color-texto-suave);
 }
 
 /* Lista de pedidos */
@@ -84,15 +85,15 @@
 
 .order-item {
     overflow: hidden;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-borde);
     border-radius: 14px;
-    background: #ffffff;
-    transition: 0.2s;
+    background: var(--color-superficie);
+    transition: 0.2s, background-color .3s ease;
 }
 
 .order-item:hover {
-    border-color: #d1d5db;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    border-color: var(--color-borde);
+    box-shadow: var(--color-sombra);
 }
 
 /* Encabezado del pedido */
@@ -112,7 +113,7 @@
 }
 
 .order-info strong {
-    color: #111827;
+    color: var(--color-texto);
     font-size: 16px;
 }
 
@@ -120,7 +121,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #6b7280;
+    color: var(--color-texto-suave);
     font-size: 13px;
 }
 
@@ -139,12 +140,13 @@
 /* Estado */
 
 .order-status {
-    padding: 6px 11px;
-    border-radius: 20px;
-    background: #dcfce7;
-    color: #166534 !important;
-    font-size: 12px !important;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
     white-space: nowrap;
 }
 
@@ -156,10 +158,10 @@
     justify-content: center;
     gap: 5px;
     padding: 7px 11px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--color-borde);
     border-radius: 8px;
-    background: #ffffff;
-    color: #374151;
+    background: var(--color-superficie);
+    color: var(--color-texto-suave);
     font-family: inherit;
     font-size: 13px;
     cursor: pointer;
@@ -168,7 +170,7 @@
 
 .details-button:hover {
     border-color: #93c5fd;
-    background: #eff6ff;
+    background: var(--color-primario-suave);
     color: #2563eb;
 }
 
@@ -179,18 +181,18 @@
     align-items: center;
     justify-content: space-between;
     padding: 15px 20px;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
-    background: #f8fafc;
+    border-top: 1px solid var(--color-borde);
+    border-bottom: 1px solid var(--color-borde);
+    background: var(--color-superficie-2);
 }
 
 .order-total-preview span {
-    color: #6b7280;
+    color: var(--color-texto-suave);
     font-size: 13px;
 }
 
 .order-total-preview strong {
-    color: #111827;
+    color: var(--color-texto);
     font-size: 16px;
 }
 
@@ -204,7 +206,7 @@
 
 .order-user {
     padding-bottom: 20px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--color-borde);
 }
 
 .order-user h3 {
@@ -212,7 +214,7 @@
     align-items: center;
     gap: 7px;
     margin: 0 0 15px;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 16px;
 }
 
@@ -230,14 +232,14 @@
 
 .order-user-grid p {
     margin: 0;
-    color: #6b7280;
+    color: var(--color-texto-suave);
     font-size: 13px;
     line-height: 1.5;
 }
 
 .order-user-grid p strong {
     margin-right: 5px;
-    color: #374151;
+    color: var(--color-texto-suave);
 }
 
 .order-user-grid .full-width {
@@ -252,10 +254,10 @@
     gap: 8px;
     margin: 18px 0;
     padding: 12px 14px;
-    border: 1px solid #dbeafe;
+    border: 1px solid var(--color-primario-suave);
     border-radius: 9px;
-    background: #eff6ff;
-    color: #374151;
+    background: var(--color-primario-suave);
+    color: var(--color-texto-suave);
     font-size: 13px;
 }
 
@@ -268,6 +270,45 @@
     color: #1d4ed8;
 }
 
+.pago-badge {
+    margin-left: auto;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pago-badge.pagado {
+    background: var(--color-badge-entregado-fondo);
+    color: var(--color-badge-entregado-texto);
+}
+
+.pago-badge.pendiente {
+    background: var(--color-badge-pendiente-fondo);
+    color: var(--color-badge-pendiente-texto);
+}
+
+.download-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #2563EB;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    align-self: flex-start;
+}
+
+.download-button:hover {
+    background: #1D4ED8;
+}
+
 /* Productos */
 
 .order-products {
@@ -276,7 +317,7 @@
 
 .order-products h3 {
     margin: 0 0 15px;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 16px;
 }
 
@@ -296,7 +337,7 @@
 }
 
 .order-products-list::-webkit-scrollbar-track {
-    background: #f3f4f6;
+    background: var(--color-superficie-2);
     border-radius: 10px;
 }
 
@@ -317,9 +358,9 @@
     align-items: center;
     gap: 13px;
     padding: 10px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-borde);
     border-radius: 10px;
-    background: #ffffff;
+    background: var(--color-superficie);
 }
 
 .order-product img {
@@ -327,7 +368,7 @@
     height: 72px;
     object-fit: cover;
     border-radius: 6px;
-    background: #f3f4f6;
+    background: var(--color-superficie-2);
 }
 
 /* Información del producto */
@@ -341,14 +382,14 @@
 
 .order-product-info strong {
     overflow: hidden;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 14px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .order-product-info span {
-    color: #6b7280;
+    color: var(--color-texto-suave);
     font-size: 12px;
 }
 
@@ -361,7 +402,7 @@
     width: fit-content;
     padding: 4px 8px;
     border-radius: 6px;
-    background: #eff6ff;
+    background: var(--color-primario-suave);
     color: #2563eb !important;
     font-size: 12px !important;
     font-weight: 600;
@@ -376,7 +417,7 @@
 
 .order-product-price {
     min-width: 90px;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 14px;
     text-align: right;
     white-space: nowrap;
@@ -390,11 +431,11 @@
     justify-content: space-between;
     margin-top: 20px;
     padding-top: 18px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-borde);
 }
 
 .order-total span {
-    color: #374151;
+    color: var(--color-texto-suave);
     font-size: 15px;
     font-weight: 500;
 }
@@ -486,4 +527,35 @@
     .order-total strong {
         font-size: 18px;
     }
+}
+
+
+/* Pendiente */
+.order-status.estado-pendiente {
+    background: var(--color-badge-pendiente-fondo);
+    color: var(--color-badge-pendiente-texto);
+}
+
+/* En proceso */
+.order-status.estado-en-proceso {
+    background: var(--color-badge-proceso-fondo);
+    color: var(--color-badge-proceso-texto);
+}
+
+/* Enviado */
+.order-status.estado-enviado {
+    background: var(--color-badge-enviado-fondo);
+    color: var(--color-badge-enviado-texto);
+}
+
+/* Entregado */
+.order-status.estado-entregado {
+    background: var(--color-badge-entregado-fondo);
+    color: var(--color-badge-entregado-texto);
+}
+
+/* Cancelado */
+.order-status.estado-cancelado {
+    background: var(--color-badge-cancelado-fondo);
+    color: var(--color-badge-cancelado-texto);
 }

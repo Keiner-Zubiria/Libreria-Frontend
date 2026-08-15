@@ -1,18 +1,21 @@
 import "./Footer.css";
+
 import {
     Mail,
     Phone,
     MapPin
 } from "lucide-react";
 
-// Componente encargado de mostrar la información adicional y datos de contacto del sitio.
-function Footer() {
+import { Link } from "react-router-dom";
+
+function Footer()
+{
     return (
+
         <footer className="footer">
 
             <div className="footer-container">
 
-                {/* Información general de la librería */}
                 <div className="footer-section">
 
                     <h3>
@@ -26,30 +29,26 @@ function Footer() {
 
                 </div>
 
-
-                {/* Sección de navegación rápida del sitio */}
                 <div className="footer-section">
 
                     <h4>
                         Enlaces
                     </h4>
 
-                    <a href="http://localhost:5173/">
+                    <Link to="/">
                         Inicio
-                    </a>
+                    </Link>
 
-                    <a href="http://localhost:5173/catalogo">
+                    <Link to="/catalogo">
                         Catálogo
-                    </a>
+                    </Link>
 
-                    <a href="#">
+                    <Link to="/contacto">
                         Contacto
-                    </a>
+                    </Link>
 
                 </div>
 
-
-                {/* Datos de contacto acompañados de iconos */}
                 <div className="footer-section">
 
                     <h4>
@@ -57,17 +56,17 @@ function Footer() {
                     </h4>
 
                     <p>
-                        <Mail size={18}/>
+                        <Mail size={ 18 } />
                         contacto@letrasmagicas.com
                     </p>
 
                     <p>
-                        <Phone size={18}/>
+                        <Phone size={ 18 } />
                         +57 300 000 0000
                     </p>
 
                     <p>
-                        <MapPin size={18}/>
+                        <MapPin size={ 18 } />
                         Sincelejo, Sucre, Colombia
                     </p>
 
@@ -75,8 +74,6 @@ function Footer() {
 
             </div>
 
-
-            {/* Información de derechos de autor */}
             <div className="footer-bottom">
 
                 <p>

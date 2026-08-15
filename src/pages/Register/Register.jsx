@@ -14,173 +14,130 @@ import {
 import {
     User,
     Mail,
-    Lock
+    Lock,
+    Eye,
+    EyeOff
 } from "lucide-react";
 
 import AuthContext from "../../context/AuthContext";
+import AlertContext from "../../context/AlertContext";
+import { API_URL } from "../../config/api";
 
 
 // Página de registro de usuarios.
 function Register()
 {
-
     const navigate = useNavigate();
 
     const { usuario } = useContext( AuthContext );
-
+    const { mostrarMensaje } = useContext( AlertContext );
 
     const [ nombre, setNombre ] = useState( "" );
-
     const [ correo, setCorreo ] = useState( "" );
-
     const [ password, setPassword ] = useState( "" );
-
     const [ confirmPassword, setConfirmPassword ] = useState( "" );
 
+    const [ mostrarPassword, setMostrarPassword ] = useState( false );
+    const [ mostrarConfirmacion, setMostrarConfirmacion ] =
+        useState( false );
 
+    const passwordSegura =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
 
-    // Si ya existe una sesión, no permite entrar al registro.
     useEffect( () =>
     {
-
         if ( usuario )
         {
-
             navigate( "/", { replace: true } );
-
         }
-
     }, [ usuario, navigate ] );
 
-
-
-    const handleSubmit = ( e ) =>
+    const handleSubmit = async ( e ) =>
     {
-
         e.preventDefault();
 
-
-
         if (
-
-            !nombre ||
-
-            !correo ||
-
+            !nombre.trim() ||
+            !correo.trim() ||
             !password ||
-
             !confirmPassword
-
         )
         {
-
-            alert(
-
-                "Completa todos los campos."
-
+            mostrarMensaje(
+                "Completa todos los campos.",
+                "warning"
             );
 
             return;
-
         }
 
-
-
-        if (
-
-            password !== confirmPassword
-
-        )
+        if ( password !== confirmPassword )
         {
-
-            alert(
-
-                "Las contraseñas no coinciden."
-
+            mostrarMensaje(
+                "Las contraseñas no coinciden.",
+                "warning"
             );
 
             return;
-
         }
 
-
-
-        const usuarios = JSON.parse(
-
-            localStorage.getItem( "usuarios" )
-
-        ) || [];
-
-
-
-        const existe = usuarios.find(
-
-            ( usuario ) =>
-
-                usuario.correo === correo
-
-        );
-
-
-
-        if ( existe )
+        if ( !passwordSegura.test( password ) )
         {
-
-            alert(
-
-                "Ese correo ya está registrado."
-
+            mostrarMensaje(
+                "La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.",
+                "warning"
             );
 
             return;
-
         }
 
+        try
+        {
+            const nuevoUsuario = {
+                nombre: nombre.trim(),
+                correo: correo.trim(),
+                password,
+                rol: "usuario"
+            };
 
+            const response = await fetch(
+                `${API_URL}/usuarios/registro`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify( nuevoUsuario )
+                }
+            );
 
-        // Todas las cuentas creadas desde
-        // el registro serán usuarios normales.
-        const nuevoUsuario = {
+            const mensaje = await response.text();
 
-            nombre,
+            if ( !response.ok )
+            {
+                throw new Error( mensaje );
+            }
 
-            correo,
+            mostrarMensaje(
+                mensaje,
+                "success"
+            );
 
-            password,
+            setTimeout( () =>
+            {
+                navigate( "/login" );
+            }, 1500 );
+        }
+        catch ( error )
+        {
+            console.error( error );
 
-            rol: "usuario"
-
-        };
-
-
-
-        usuarios.push( nuevoUsuario );
-
-
-
-        localStorage.setItem(
-
-            "usuarios",
-
-            JSON.stringify( usuarios )
-
-        );
-
-
-
-        alert(
-
-            "Cuenta creada correctamente."
-
-        );
-
-
-
-        navigate( "/login" );
-
+            mostrarMensaje(
+                error.message || "No se pudo crear la cuenta.",
+                "error"
+            );
+        }
     };
-
-
 
     return (
 
@@ -188,186 +145,155 @@ function Register()
 
             <section className="login-card">
 
-
                 <h1>
-
                     Letras Mágicas
-
                 </h1>
 
-
                 <h2>
-
                     Crear cuenta
-
                 </h2>
 
-
-
                 <form
-
                     className="login-form"
-
                     onSubmit={ handleSubmit }
-
                 >
-
 
                     <div className="input-group">
 
                         <User size={ 20 } />
 
-
                         <input
-
                             type="text"
-
                             placeholder="Nombre completo"
-
                             value={ nombre }
-
                             onChange={ ( e ) =>
-
-                                setNombre(
-
-                                    e.target.value
-
-                                )
-
+                                setNombre( e.target.value )
                             }
-
+                            required
                         />
 
                     </div>
-
-
 
                     <div className="input-group">
 
                         <Mail size={ 20 } />
 
-
                         <input
-
                             type="email"
-
                             placeholder="Correo electrónico"
-
                             value={ correo }
-
                             onChange={ ( e ) =>
-
-                                setCorreo(
-
-                                    e.target.value
-
-                                )
-
+                                setCorreo( e.target.value )
                             }
-
+                            required
                         />
 
                     </div>
 
-
-
-                    <div className="input-group">
+                    <div className="input-group password-group">
 
                         <Lock size={ 20 } />
 
-
                         <input
-
-                            type="password"
-
+                            type={
+                                mostrarPassword
+                                    ? "text"
+                                    : "password"
+                            }
                             placeholder="Contraseña"
-
                             value={ password }
-
+                            minLength={ 8 }
                             onChange={ ( e ) =>
-
-                                setPassword(
-
-                                    e.target.value
-
-                                )
-
+                                setPassword( e.target.value )
                             }
-
+                            required
                         />
+
+                        <button
+                            type="button"
+                            className="password-toggle"
+                            onClick={ () =>
+                                setMostrarPassword( !mostrarPassword )
+                            }
+                            aria-label={
+                                mostrarPassword
+                                    ? "Ocultar contraseña"
+                                    : "Mostrar contraseña"
+                            }
+                        >
+                            {mostrarPassword
+                                ? <EyeOff size={ 20 } />
+                                : <Eye size={ 20 } />
+                            }
+                        </button>
 
                     </div>
 
 
-
-                    <div className="input-group">
+                    <div className="input-group password-group">
 
                         <Lock size={ 20 } />
 
-
                         <input
-
-                            type="password"
-
-                            placeholder="Confirmar contraseña"
-
-                            value={ confirmPassword }
-
-                            onChange={ ( e ) =>
-
-                                setConfirmPassword(
-
-                                    e.target.value
-
-                                )
-
+                            type={
+                                mostrarConfirmacion
+                                    ? "text"
+                                    : "password"
                             }
-
+                            placeholder="Confirmar contraseña"
+                            value={ confirmPassword }
+                            minLength={ 8 }
+                            onChange={ ( e ) =>
+                                setConfirmPassword( e.target.value )
+                            }
+                            required
                         />
 
+                        <button
+                            type="button"
+                            className="password-toggle"
+                            onClick={ () =>
+                                setMostrarConfirmacion(
+                                    !mostrarConfirmacion
+                                )
+                            }
+                            aria-label={
+                                mostrarConfirmacion
+                                    ? "Ocultar confirmación"
+                                    : "Mostrar confirmación"
+                            }
+                        >
+                            {mostrarConfirmacion
+                                ? <EyeOff size={ 20 } />
+                                : <Eye size={ 20 } />
+                            }
+                        </button>
+
                     </div>
-
-
 
                     <button
-
                         type="submit"
-
                         className="login-button"
-
                     >
-
                         Registrarse
-
                     </button>
 
-
                 </form>
-
-
 
                 <p className="login-footer">
 
                     ¿Ya tienes una cuenta?{" "}
 
-
                     <Link to="/login">
-
                         Iniciar sesión
-
                     </Link>
 
-
                 </p>
-
 
             </section>
 
         </main>
-
     );
-
 }
-
 
 export default Register;

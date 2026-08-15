@@ -1,5 +1,65 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+/* Tema claro (por defecto) */
+:root {
+
+    --color-fondo: #F8FAFC;
+    --color-superficie: #FFFFFF;
+    --color-superficie-2: #F1F5F9;
+    --color-texto: #1F2937;
+    --color-texto-suave: #6B7280;
+    --color-borde: #E2E8F0;
+    --color-sombra: rgba(15, 23, 42, .08);
+    --color-primario-suave: #DBEAFE;
+    --color-exito-suave: #DCFCE7;
+    --color-error-suave: #FEE2E2;
+    --color-warning-suave: #FEF3C7;
+    --color-entrada: #FFFFFF;
+    --color-navbar: #111827;
+
+    --color-badge-pendiente-fondo: #FEF3C7;
+    --color-badge-pendiente-texto: #92400E;
+    --color-badge-proceso-fondo: #DBEAFE;
+    --color-badge-proceso-texto: #1E40AF;
+    --color-badge-enviado-fondo: #E0E7FF;
+    --color-badge-enviado-texto: #3730A3;
+    --color-badge-entregado-fondo: #DCFCE7;
+    --color-badge-entregado-texto: #166534;
+    --color-badge-cancelado-fondo: #FEE2E2;
+    --color-badge-cancelado-texto: #991B1B;
+
+}
+
+/* Tema oscuro */
+.dark {
+
+    --color-fondo: #0F172A;
+    --color-superficie: #1E293B;
+    --color-superficie-2: #334155;
+    --color-texto: #E2E8F0;
+    --color-texto-suave: #94A3B8;
+    --color-borde: #334155;
+    --color-sombra: rgba(0, 0, 0, .4);
+    --color-primario-suave: #1E3A8A;
+    --color-exito-suave: #14532D;
+    --color-error-suave: #7F1D1D;
+    --color-warning-suave: #78350F;
+    --color-entrada: #0F172A;
+    --color-navbar: #0F172A;
+
+    --color-badge-pendiente-fondo: #78350F;
+    --color-badge-pendiente-texto: #FDE68A;
+    --color-badge-proceso-fondo: #1E3A8A;
+    --color-badge-proceso-texto: #93C5FD;
+    --color-badge-enviado-fondo: #3730A3;
+    --color-badge-enviado-texto: #C7D2FE;
+    --color-badge-entregado-fondo: #14532D;
+    --color-badge-entregado-texto: #86EFAC;
+    --color-badge-cancelado-fondo: #7F1D1D;
+    --color-badge-cancelado-texto: #FCA5A5;
+
+}
+
 * {
 
     margin: 0;
@@ -14,9 +74,11 @@ body {
 
     font-family: 'Poppins', sans-serif;
 
-    background: #F8FAFC;
+    background: var(--color-fondo);
 
-    color: #1F2937;
+    color: var(--color-texto);
+
+    transition: background-color .3s ease, color .3s ease;
 
 }
 

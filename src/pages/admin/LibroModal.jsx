@@ -1,8 +1,13 @@
 import "./LibroModal.css";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { createPortal } from "react-dom";
 
 import { X } from "lucide-react";
+
+import { API_URL, UPLOADS_URL } from "../../config/api";
+
 
 
 // Modal para agregar o editar un libro.
@@ -11,7 +16,6 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
     // Datos iniciales del formulario.
     const datosIniciales = {
-
         titulo: "",
         autor: "",
         categoria: "",
@@ -21,20 +25,10 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
         imagen: "",
         descripcion: "",
         calificacion: 5,
-
-        formatos: [
-
-            "Fisico",
-            "Virtual"
-
-        ],
-
+        formatos: [ "Fisico", "Virtual" ],
         destacado: false,
-
         vendidos: 0
-
     };
-
 
     // Si estamos editando, carga los datos del libro.
     // Si estamos agregando, utiliza los datos vacíos.
@@ -71,15 +65,14 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
                     libroEditar.vendidos ?? 0,
 
                 formatos:
-
-                    libroEditar.formatos ||
-
-                    [
-
-                        "Fisico",
-                        "Virtual"
-
-                    ]
+                    Array.isArray( libroEditar.formatos )
+                        ? libroEditar.formatos
+                        : libroEditar.formatos
+                            ? libroEditar.formatos.split( "," )
+                            : [
+                                "Fisico",
+                                "Virtual"
+                            ]
 
             };
 
@@ -93,10 +86,34 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
     // Vista previa de la imagen.
     const [ imagenPreview, setImagenPreview ] = useState(
-
-        libroEditar?.imagen || ""
-
+        libroEditar?.imagen
+            ? `${UPLOADS_URL}/${ libroEditar.imagen }`
+            : ""
     );
+
+    const [ archivoImagen, setArchivoImagen ] = useState( null );
+
+    // Archivo PDF del libro digital.
+    const [ archivoPdf, setArchivoPdf ] = useState( null );
+
+    const [ categorias, setCategorias ] = useState( [] );
+
+
+    useEffect( () =>
+    {
+        fetch( `${API_URL}/categorias` )
+            .then( respuesta => respuesta.json() )
+            .then( datos => setCategorias( datos ) )
+            .catch( error =>
+            {
+                console.error(
+                    "Error al cargar categorías:",
+                    error
+                );
+            } );
+
+    }, [] );
+
 
 
 
@@ -125,39 +142,11 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
         const archivo = e.target.files[ 0 ];
 
+        if ( !archivo ) return;
 
-        if ( !archivo )
-        {
+        setArchivoImagen( archivo );
 
-            return;
-
-        }
-
-
-        const reader = new FileReader();
-
-
-        reader.onload = () =>
-        {
-
-            const imagen = reader.result;
-
-
-            setImagenPreview( imagen );
-
-
-            setLibro( ( anterior ) => ( {
-
-                ...anterior,
-
-                imagen
-
-            } ) );
-
-        };
-
-
-        reader.readAsDataURL( archivo );
+        setImagenPreview( URL.createObjectURL( archivo ) );
 
     };
 
@@ -169,14 +158,25 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
         setImagenPreview( "" );
 
+        setArchivoImagen( null );
 
         setLibro( ( anterior ) => ( {
-
             ...anterior,
-
             imagen: ""
-
         } ) );
+
+    };
+
+
+    // Selecciona el archivo PDF del libro.
+    const seleccionarPdf = ( e ) =>
+    {
+
+        const archivo = e.target.files[ 0 ];
+
+        if ( !archivo ) return;
+
+        setArchivoPdf( archivo );
 
     };
 
@@ -188,84 +188,48 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
         e.preventDefault();
 
+        const formData = new FormData();
 
-        /*
-         * Si estamos editando:
-         * conserva el mismo ID.
-         *
-         * Si estamos agregando:
-         * genera un ID nuevo.
-         */
-        const id =
+        formData.append( "titulo", libro.titulo );
+        formData.append( "autor", libro.autor );
+        formData.append( "categoria", libro.categoria );
 
-            libroEditar
+        formData.append( "precioFisico", Number( libro.precioFisico ) || 0 );
+        formData.append( "precioVirtual", Number( libro.precioVirtual ) || 0 );
 
-                ? libroEditar.id
+        formData.append( "stock", Number( libro.stock ) || 0 );
+        formData.append( "stockVirtual", 0 );
 
-                : Date.now();
+        formData.append( "formatos", libro.formatos.join( "," ) );
 
+        formData.append( "descripcion", libro.descripcion );
 
+        formData.append( "calificacion", libro.calificacion );
 
-        const libroGuardado = {
+        formData.append(
+            "vendidos",
+            libroEditar ? libroEditar.vendidos ?? 0 : 0
+        );
 
-            ...libro,
+        formData.append( "destacado", libro.destacado );
 
-            id,
+        if ( archivoImagen )
+        {
+            formData.append( "imagen", archivoImagen );
+        }
 
+        if ( archivoPdf )
+        {
+            formData.append( "archivo", archivoPdf );
+        }
 
-            precioFisico:
-
-                Number( libro.precioFisico ) || 0,
-
-
-            precioVirtual:
-
-                Number( libro.precioVirtual ) || 0,
-
-
-            stock:
-
-                Number( libro.stock ) || 0,
-
-
-            stockVirtual:
-
-                Infinity,
-
-
-            formatos:
-
-                libro.formatos,
-
-
-            /*
-             * Al editar conserva la cantidad de vendidos.
-             *
-             * Al agregar empieza en cero.
-             */
-            vendidos:
-
-                libroEditar
-
-                    ? ( libroEditar.vendidos || 0 )
-
-                    : 0,
-
-
-            destacado:
-
-                libro.destacado
-
-        };
-
-
-        onGuardar( libroGuardado );
+        onGuardar( formData );
 
     };
 
 
 
-    return (
+    return createPortal(
 
         <div className="modal-overlay">
 
@@ -273,7 +237,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
             <div className="modal-container">
 
 
-                {/* Encabezado */}
+                {/* Encabezado */ }
                 <div className="modal-header">
 
                     <h2>
@@ -309,7 +273,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                {/* Formulario */}
+                {/* Formulario */ }
                 <form
 
                     className="modal-form"
@@ -319,7 +283,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
                 >
 
 
-                    {/* Título */}
+                    {/* Título */ }
                     <div className="form-group">
 
                         <label>
@@ -347,7 +311,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Autor */}
+                    {/* Autor */ }
                     <div className="form-group">
 
                         <label>
@@ -375,35 +339,46 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Categoría */}
+                    {/* Categoría */ }
                     <div className="form-group">
 
                         <label>
-
                             Categoría
-
                         </label>
 
-
-                        <input
-
-                            type="text"
-
+                        <select
                             name="categoria"
-
                             value={ libro.categoria }
-
                             onChange={ cambiarCampo }
-
                             required
+                        >
 
-                        />
+                            <option value="">
+                                Seleccione una categoría
+                            </option>
+
+                            {
+                                categorias.map( categoria => (
+
+                                    <option
+                                        key={ categoria.id }
+                                        value={ categoria.nombre }
+                                    >
+
+                                        { categoria.nombre }
+
+                                    </option>
+
+                                ) )
+                            }
+
+                        </select>
 
                     </div>
 
 
 
-                    {/* Precio físico */}
+                    {/* Precio físico */ }
                     <div className="form-group">
 
                         <label>
@@ -429,7 +404,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Precio virtual */}
+                    {/* Precio virtual */ }
                     <div className="form-group">
 
                         <label>
@@ -455,7 +430,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Stock */}
+                    {/* Stock */ }
                     <div className="form-group">
 
                         <label>
@@ -481,7 +456,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Imagen */}
+                    {/* Imagen */ }
                     <div className="form-group">
 
                         <label>
@@ -541,7 +516,56 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Descripción */}
+                    {/* Archivo digital (PDF) */ }
+                    <div className="form-group">
+
+                        <label>
+
+                            Archivo digital (PDF)
+
+                        </label>
+
+
+                        <input
+
+                            type="file"
+
+                            accept="application/pdf"
+
+                            onChange={ seleccionarPdf }
+
+                        />
+
+
+                        {
+                            libroEditar?.archivo && !archivoPdf && (
+
+                                <p className="pdf-info">
+
+                                    Archivo actual: { libroEditar.archivo }
+
+                                </p>
+
+                            )
+                        }
+
+                        {
+                            archivoPdf && (
+
+                                <p className="pdf-info">
+
+                                    Nuevo archivo: { archivoPdf.name }
+
+                                </p>
+
+                            )
+                        }
+
+                    </div>
+
+
+
+                    {/* Descripción */ }
                     <div className="form-group full-width">
 
                         <label>
@@ -567,7 +591,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Calificación */}
+                    {/* Calificación */ }
                     <div className="form-group">
 
                         <label>
@@ -599,7 +623,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Formato */}
+                    {/* Formato */ }
                     <div className="form-group">
 
                         <label>
@@ -684,7 +708,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Destacado */}
+                    {/* Destacado */ }
                     <div className="form-group checkbox-group">
 
                         <label>
@@ -720,7 +744,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
 
 
-                    {/* Botones */}
+                    {/* Botones */ }
                     <div className="modal-buttons">
 
 
@@ -770,7 +794,9 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
             </div>
 
 
-        </div>
+        </div>,
+
+        document.body
 
     );
 

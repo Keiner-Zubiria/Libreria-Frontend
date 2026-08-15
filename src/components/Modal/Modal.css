@@ -9,12 +9,14 @@
 }
 
 .modal-content {
-    background: white;
+    background: var(--color-superficie);
+    color: var(--color-texto);
     width: 90%;
     max-width: 500px;
     padding: 30px;
     border-radius: 15px;
     position: relative;
+    transition: background-color .3s ease, color .3s ease;
 }
 
 .modal-close {
@@ -25,4 +27,5 @@
     background: transparent;
     font-size: 18px;
     cursor: pointer;
+    color: var(--color-texto-suave);
 }

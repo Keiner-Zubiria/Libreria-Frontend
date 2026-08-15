@@ -7,8 +7,8 @@ import
     BookOpen,
     Package,
     Users,
-    DollarSign,
-    LayoutDashboard
+    LayoutDashboard,
+    Tag
 } from "lucide-react";
 
 
@@ -49,7 +49,18 @@ function Admin()
 
                             <LayoutDashboard size={20} />
 
-                            Dashboard
+                            Modulos
+
+                        </NavLink>
+
+ 
+                        <NavLink
+                            to="/admin/categorias"
+                        >
+
+                            <Tag size={20} />
+
+                            Categorias
 
                         </NavLink>
 
@@ -89,17 +100,6 @@ function Admin()
 
                         </NavLink>
 
-
-
-                        <NavLink
-                            to="/admin/ventas"
-                        >
-
-                            <DollarSign size={20} />
-
-                            Ventas
-
-                        </NavLink>
 
 
                     </nav>

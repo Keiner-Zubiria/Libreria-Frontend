@@ -1,23 +1,23 @@
 import "./BookDetail.css";
 
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 
 import
-    {
-        ShoppingCart,
-        Package,
-        Monitor,
-        Star,
-        ShoppingBag
-    } from "lucide-react";
+{
+    ShoppingCart,
+    Package,
+    Monitor,
+    Star,
+    ShoppingBag
+} from "lucide-react";
 
-
-import booksData from "../../data/books";
+import { obtenerLibro } from "../../services/libroService";
+import { UPLOADS_URL } from "../../config/api";
 
 import CartContext from "../../context/CartContext";
 import AuthContext from "../../context/AuthContext";
-
+import AlertContext from "../../context/AlertContext";
 
 
 // Página encargada de mostrar la información completa de un libro.
@@ -28,56 +28,55 @@ function BookDetail()
 
     const navigate = useNavigate();
 
-
     const [ quantity, setQuantity ] = useState( 1 );
-
 
     // Controla el formato seleccionado.
     const [ formato, setFormato ] = useState( "Fisico" );
 
-
-
-    // Carga libros desde localStorage.
-    const [ books ] = useState( () =>
-    {
-
-        const librosGuardados = localStorage.getItem( "libros" );
-
-
-        if ( librosGuardados )
-        {
-            return JSON.parse( librosGuardados );
-        }
-
-
-        return booksData;
-
-    } );
-
-
+    // Almacena la información del libro obtenida desde la API.
+    const [ book, setBook ] = useState( null );
 
     // Obtiene funciones del carrito.
     const { addToCart } = useContext( CartContext );
 
-
-
     // Usuario activo.
     const { usuario } = useContext( AuthContext );
 
+    // Alertas 
+    const { mostrarMensaje } = useContext(AlertContext);
 
 
 
-    // Busca el libro seleccionado.
-    const book = books.find(
+    // Carga la información del libro cuando se abre la página.
+    useEffect( () =>
+    {
 
-        ( book ) => book.id === Number( id )
+        const cargarLibro = async () =>
+        {
 
-    );
+            try
+            {
+
+                const response = await obtenerLibro( id );
+
+                setBook( response.data );
+
+            }
+            catch ( error )
+            {
+
+                console.error( "Error al cargar el libro:", error );
+
+            }
+
+        };
+
+        cargarLibro();
+
+    }, [ id ] );
 
 
-
-
-    // Si no existe el libro.
+    // Mientras carga la información.
     if ( !book )
     {
 
@@ -90,7 +89,9 @@ function BookDetail()
                     <div className="detail-info">
 
                         <h2>
-                            Libro no encontrado.
+
+                            Cargando libro...
+
                         </h2>
 
                     </div>
@@ -104,46 +105,28 @@ function BookDetail()
     }
 
 
-
-
-
     // Precio según formato.
     const precio =
-
         formato === "Fisico"
-
-            ? book.precioFisico
-
-            : book.precioVirtual;
-
-
-
+            ? ( book.precioFisico || 0 )
+            : ( book.precioVirtual || 0 );
 
 
     // Stock según formato.
     const stock =
-
         formato === "Fisico"
-
-            ? book.stock
-
-            : book.stockVirtual;
-
-
+            ? ( book.stock || 0 )
+            : ( book.stockVirtual || 9999 );
 
 
     const stockIlimitado = formato === "Virtual";
-
-
-
-
 
 
     // Agregar carrito.
     const handleAddToCart = () =>
     {
 
-        addToCart( {
+        const agregado = addToCart( {
 
             ...book,
 
@@ -157,11 +140,17 @@ function BookDetail()
 
         } );
 
+        mostrarMensaje(
+
+            agregado
+                ? "Libro agregado al carrito."
+                : "El libro virtual ya está en tu carrito.",
+
+            agregado ? "success" : "warning"
+
+        );
+
     };
-
-
-
-
 
 
     // Comprar ahora.
@@ -171,50 +160,41 @@ function BookDetail()
         if ( !usuario )
         {
 
-            alert(
-                "Debes iniciar sesión para realizar una compra."
+            mostrarMensaje(
+                "Debes iniciar sesión para realizar una compra.",
+                "warning"
             );
 
-
             navigate( "/login" );
-
 
             return;
 
         }
 
 
+        navigate( "/checkout", {
 
-        navigate( "/checkout",
-            {
+            state: {
 
-                state:
-                {
+                producto: {
 
-                    producto:
-                    {
+                    ...book,
 
-                        ...book,
+                    precio,
 
-                        precio,
+                    stock,
 
-                        stock,
+                    formato,
 
-                        formato,
-
-                        quantity
-
-                    }
+                    quantity
 
                 }
 
-            } );
+            }
+
+        } );
 
     };
-
-
-
-
 
 
     // Cambiar formato.
@@ -228,23 +208,27 @@ function BookDetail()
     };
 
 
-
-
-
     return (
 
         <main className="book-detail">
 
-
             <section className="detail-container">
 
 
-
+                {/* Imagen del libro */ }
                 <div className="detail-image">
 
                     <img
 
-                        src={ book.imagen }
+                        src={
+
+                            book.imagen
+
+                                ? `${UPLOADS_URL}/${ book.imagen }`
+
+                                : "/images/default-book.jpg"
+
+                        }
 
                         alt={ book.titulo }
 
@@ -253,20 +237,14 @@ function BookDetail()
                 </div>
 
 
-
-
-
+                {/* Información del libro */ }
                 <div className="detail-info">
-
-
 
                     <h1>
 
                         { book.titulo }
 
                     </h1>
-
-
 
 
                     <h3>
@@ -276,8 +254,6 @@ function BookDetail()
                     </h3>
 
 
-
-
                     <p className="detail-category">
 
                         Categoría: { book.categoria }
@@ -285,19 +261,13 @@ function BookDetail()
                     </p>
 
 
-
-
-
                     <p className="detail-rating">
 
                         <Star size={ 17 } />
 
-                        { book.calificacion }
+                        { book.calificacion || "Sin calificación" }
 
                     </p>
-
-
-
 
 
                     <p className="detail-sold">
@@ -307,13 +277,8 @@ function BookDetail()
                     </p>
 
 
-
-
-
-
-
+                    {/* Formato */ }
                     <div className="format-box">
-
 
                         <span className="format-title">
 
@@ -322,17 +287,16 @@ function BookDetail()
                         </span>
 
 
-
-
                         <div className="format-options">
 
 
+                            { (
 
-                            {
+                                book.formatos?.includes( "Fisico" )
 
-                                book.formatos.includes( "Fisico" ) &&
+                                ?? true
 
-                                (
+                            ) && (
 
                                     <button
 
@@ -349,7 +313,9 @@ function BookDetail()
                                         }
 
                                         onClick={ () =>
+
                                             cambiarFormato( "Fisico" )
+
                                         }
 
                                     >
@@ -360,65 +326,48 @@ function BookDetail()
 
                                     </button>
 
-                                )
-
-                            }
+                                ) }
 
 
+                            { book.formatos?.includes( "Virtual" ) && (
 
+                                <button
 
+                                    type="button"
 
+                                    className={
 
-                            {
+                                        formato === "Virtual"
 
-                                book.formatos.includes( "Virtual" ) &&
+                                            ? "format-option selected"
 
-                                (
+                                            : "format-option"
 
-                                    <button
+                                    }
 
-                                        type="button"
+                                    onClick={ () =>
 
-                                        className={
+                                        cambiarFormato( "Virtual" )
 
-                                            formato === "Virtual"
+                                    }
 
-                                                ? "format-option selected"
+                                >
 
-                                                : "format-option"
+                                    <Monitor size={ 18 } />
 
-                                        }
+                                    Virtual
 
-                                        onClick={ () =>
-                                            cambiarFormato( "Virtual" )
-                                        }
+                                </button>
 
-                                    >
-
-                                        <Monitor size={ 18 } />
-
-                                        Virtual
-
-                                    </button>
-
-                                )
-
-                            }
-
-
+                            ) }
 
 
                         </div>
 
-
                     </div>
 
 
-
-
-
-
-
+                    {/* Precio */ }
                     <h2 className="detail-price">
 
                         $
@@ -428,93 +377,95 @@ function BookDetail()
                     </h2>
 
 
-
-
-
-
-
+                    {/* Stock */ }
                     <p className="detail-stock">
-
 
                         {
 
                             stockIlimitado
 
-                                ?
+                                ? "Disponible de forma ilimitada"
 
-                                "Disponible de forma ilimitada"
-
-                                :
-
-                                `Stock disponible: ${ stock }`
+                                : `Stock disponible: ${ stock }`
 
                         }
-
 
                     </p>
 
 
-                    {
-                        formato === "Fisico" && (
+                    {/* Cantidad */ }
+                    { formato === "Fisico" && (
 
-                            <div className="quantity-box">
+                        <div className="quantity-box">
 
-                                <span>
-                                    Cantidad:
-                                </span>
+                            <span>
 
+                                Cantidad:
 
-                                <button
-                                    type="button"
-                                    onClick={ () =>
-                                        setQuantity(
-                                            quantity > 1
-                                                ?
-                                                quantity - 1
-                                                :
-                                                1
-                                        )
-                                    }
-                                >
-
-                                    −
-
-                                </button>
+                            </span>
 
 
+                            <button
 
-                                <strong>
+                                type="button"
 
-                                    { quantity }
+                                onClick={ () =>
 
-                                </strong>
+                                    setQuantity(
 
+                                        quantity > 1
 
+                                            ? quantity - 1
 
-                                <button
-                                    type="button"
-                                    onClick={ () =>
-                                        quantity < stock &&
-                                        setQuantity( quantity + 1 )
-                                    }
-                                >
+                                            : 1
 
-                                    +
+                                    )
 
-                                </button>
+                                }
 
+                            >
 
-                            </div>
+                                −
 
-                        )
-                    }
+                            </button>
 
 
+                            <strong>
+
+                                { quantity }
+
+                            </strong>
 
 
+                            <button
+
+                                type="button"
+
+                                onClick={ () =>
+
+                                    quantity < stock &&
+
+                                    setQuantity(
+
+                                        quantity + 1
+
+                                    )
+
+                                }
+
+                            >
+
+                                +
+
+                            </button>
+
+                        </div>
+
+                    ) }
+
+
+                    {/* Acciones */ }
                     <div className="detail-actions">
-
-
 
                         <button
 
@@ -528,11 +479,7 @@ function BookDetail()
 
                             Agregar al carrito
 
-
                         </button>
-
-
-
 
 
                         <button
@@ -547,32 +494,17 @@ function BookDetail()
 
                             Comprar ahora
 
-
                         </button>
-
-
-
 
                     </div>
 
-
-
-
-
                 </div>
-
-
 
             </section>
 
 
-
-
-
-
-
+            {/* Descripción */ }
             <section className="description-section">
-
 
                 <h2>
 
@@ -581,27 +513,24 @@ function BookDetail()
                 </h2>
 
 
-
-
                 <p>
 
-                    { book.descripcion }
+                    {
+
+                        book.descripcion
+
+                        || "Descripción no disponible."
+
+                    }
 
                 </p>
 
-
-
             </section>
-
-
-
-
 
         </main>
 
     );
 
 }
-
 
 export default BookDetail;

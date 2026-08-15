@@ -1,203 +1,316 @@
 import "./Profile.css";
 
 import { useContext, useState } from "react";
+
 import {
     UserCircle,
     Mail,
     Lock,
     LogOut,
-    Pencil,
     Save,
-    X
+    Trash2,
+    Eye,
+    EyeOff
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
 import AuthContext from "../../context/AuthContext";
+import AlertContext from "../../context/AlertContext";
+import { API_URL, authFetch } from "../../config/api";
 
-
-// Página de perfil del usuario.
-function Profile() {
-
+function Profile()
+{
     const {
         usuario,
         logout,
         updateUser
-    } = useContext(AuthContext);
+    } = useContext( AuthContext );
+
+    const { mostrarMensaje } =
+        useContext( AlertContext );
 
     const navigate = useNavigate();
 
+    const [ nombre, setNombre ] =
+        useState( usuario?.nombre || "" );
 
-    const [editando, setEditando] = useState(false);
+    const [ correo, setCorreo ] =
+        useState( usuario?.correo || "" );
 
-    const [nombre, setNombre] = useState(
-        usuario?.nombre || ""
-    );
+    const [ passwordActual, setPasswordActual ] =
+        useState( "" );
 
-    const [correo, setCorreo] = useState(
-        usuario?.correo || ""
-    );
+    const [ nuevaPassword, setNuevaPassword ] =
+        useState( "" );
 
-    const [password, setPassword] = useState("");
+    const [ confirmarPassword, setConfirmarPassword ] =
+        useState( "" );
 
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [ mostrarActual, setMostrarActual ] =
+        useState( false );
 
+    const [ mostrarNueva, setMostrarNueva ] =
+        useState( false );
 
-    // Cerrar sesión.
-    const cerrarSesion = () => {
+    const [ mostrarConfirmacion, setMostrarConfirmacion ] =
+        useState( false );
 
+    const [ borrandoCuenta, setBorrandoCuenta ] =
+        useState( false );
+
+    const actualizarPerfil = async ( datos, mensaje ) =>
+    {
+        try
+        {
+            const respuesta = await authFetch(
+                `${API_URL}/usuarios/${ usuario.id }`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify( datos )
+                }
+            );
+
+            const texto = await respuesta.text();
+
+            let resultado;
+
+            try
+            {
+                resultado = JSON.parse( texto );
+            }
+            catch
+            {
+                resultado = texto;
+            }
+
+            if ( !respuesta.ok )
+            {
+                mostrarMensaje(
+                    typeof resultado === "string"
+                        ? resultado
+                        : resultado.message,
+                    "error"
+                );
+
+                return false;
+            }
+
+            updateUser( resultado );
+
+            mostrarMensaje(
+                mensaje,
+                "success"
+            );
+
+            return true;
+        }
+        catch ( error )
+        {
+            console.error( error );
+
+            mostrarMensaje(
+                "No fue posible actualizar el perfil.",
+                "error"
+            );
+
+            return false;
+        }
+    };
+
+    const guardarNombre = async () =>
+    {
+        if ( !nombre.trim() )
+        {
+            mostrarMensaje(
+                "El nombre es obligatorio.",
+                "warning"
+            );
+
+            return;
+        }
+
+        await actualizarPerfil(
+            {
+                nombre: nombre.trim(),
+                correo: usuario.correo
+            },
+            "Nombre actualizado correctamente."
+        );
+    };
+
+    const guardarCorreo = async () =>
+    {
+        if ( !correo.trim() )
+        {
+            mostrarMensaje(
+                "El correo es obligatorio.",
+                "warning"
+            );
+
+            return;
+        }
+
+        if ( !passwordActual.trim() )
+        {
+            mostrarMensaje(
+                "Escribe tu contraseña actual para cambiar el correo.",
+                "warning"
+            );
+
+            return;
+        }
+
+        const actualizado = await actualizarPerfil(
+            {
+                nombre: usuario.nombre,
+                correo: correo.trim(),
+                passwordActual
+            },
+            "Correo actualizado correctamente."
+        );
+
+        if ( actualizado )
+        {
+            setPasswordActual( "" );
+        }
+    };
+
+    const cambiarPassword = async () =>
+    {
+        if ( !passwordActual.trim() )
+        {
+            mostrarMensaje(
+                "Escribe tu contraseña actual.",
+                "warning"
+            );
+
+            return;
+        }
+
+        if ( !nuevaPassword || !confirmarPassword )
+        {
+            mostrarMensaje(
+                "Completa los campos de la nueva contraseña.",
+                "warning"
+            );
+
+            return;
+        }
+
+        if ( nuevaPassword !== confirmarPassword )
+        {
+            mostrarMensaje(
+                "Las contraseñas no coinciden.",
+                "warning"
+            );
+
+            return;
+        }
+
+        const actualizado = await actualizarPerfil(
+            {
+                nombre: usuario.nombre,
+                correo: usuario.correo,
+                passwordActual,
+                nuevaPassword,
+                confirmarPassword
+            },
+            "Contraseña actualizada correctamente."
+        );
+
+        if ( actualizado )
+        {
+            setPasswordActual( "" );
+            setNuevaPassword( "" );
+            setConfirmarPassword( "" );
+        }
+    };
+
+    const cerrarSesion = () =>
+    {
         logout();
-
-        navigate("/");
-
+        navigate( "/" );
     };
 
+    const borrarCuenta = async () =>
+    {
+        const confirmar = window.confirm(
+            "¿Seguro que deseas eliminar tu cuenta? Esta acción no se puede deshacer."
+        );
 
-    // Activar edición.
-    const comenzarEdicion = () => {
-
-        setNombre(usuario.nombre);
-
-        setCorreo(usuario.correo);
-
-        setPassword("");
-
-        setConfirmPassword("");
-
-        setEditando(true);
-
-    };
-
-
-    // Cancelar edición.
-    const cancelarEdicion = () => {
-
-        setNombre(usuario.nombre);
-
-        setCorreo(usuario.correo);
-
-        setPassword("");
-
-        setConfirmPassword("");
-
-        setEditando(false);
-
-    };
-
-
-    // Guardar cambios.
-    const guardarCambios = () => {
-
-        if (!nombre.trim() || !correo.trim()) {
-
-            alert("El nombre y el correo son obligatorios.");
-
+        if ( !confirmar )
+        {
             return;
-
         }
 
+        const password = window.prompt(
+            "Escribe tu contraseña actual para confirmar:"
+        );
 
-        if (
-            password &&
-            password !== confirmPassword
-        ) {
-
-            alert("Las contraseñas no coinciden.");
-
+        if ( !password )
+        {
             return;
-
         }
 
+        setBorrandoCuenta( true );
 
-        const usuarios = JSON.parse(
+        try
+        {
+            const respuesta = await authFetch(
+                `${API_URL}/usuarios/${ usuario.id }?password=${ encodeURIComponent( password ) }`,
+                {
+                    method: "DELETE"
+                }
+            );
 
-            localStorage.getItem("usuarios")
+            const mensaje = await respuesta.text();
 
-        ) || [];
+            if ( !respuesta.ok )
+            {
+                mostrarMensaje(
+                    mensaje,
+                    "error"
+                );
 
+                return;
+            }
 
-        const usuarioActualizado = {
+            logout();
+            navigate( "/" );
 
-            nombre: nombre.trim(),
+            mostrarMensaje(
+                "Tu cuenta fue eliminada correctamente.",
+                "success"
+            );
+        }
+        catch ( error )
+        {
+            console.error( error );
 
-            correo: correo.trim(),
-
-            ...(password
-                ? { password }
-                : {}
-            )
-
-        };
-
-
-        const usuariosActualizados = usuarios.map(
-
-            (item) =>
-
-                item.correo === usuario.correo
-
-                    ? usuarioActualizado
-
-                    : item
-
-        );
-
-
-        localStorage.setItem(
-
-            "usuarios",
-
-            JSON.stringify(usuariosActualizados)
-
-        );
-
-
-        localStorage.setItem(
-
-            "usuarioActivo",
-
-            JSON.stringify({
-
-                nombre: usuarioActualizado.nombre,
-
-                correo: usuarioActualizado.correo
-
-            })
-
-        );
-
-
-        // Actualiza el usuario dentro del AuthContext.
-        updateUser({
-
-            nombre: usuarioActualizado.nombre,
-
-            correo: usuarioActualizado.correo
-
-        });
-
-
-        setPassword("");
-
-        setConfirmPassword("");
-
-        setEditando(false);
-
-        alert("Perfil actualizado correctamente.");
-
+            mostrarMensaje(
+                "No fue posible eliminar la cuenta.",
+                "error"
+            );
+        }
+        finally
+        {
+            setBorrandoCuenta( false );
+        }
     };
 
-
-    // Si no hay usuario iniciado.
-    if (!usuario) {
-
+    if ( !usuario )
+    {
         return (
 
             <main className="profile-page">
 
-                <section className="profile-card">
+                <section className="profile-card profile-empty">
 
-                    <UserCircle size={60} />
+                    <UserCircle size={ 64 } />
 
                     <h1>
                         No has iniciado sesión
@@ -209,21 +322,16 @@ function Profile() {
 
                     <button
                         className="profile-button"
-                        onClick={() => navigate("/login")}
+                        onClick={ () => navigate( "/login" ) }
                     >
-
                         Iniciar sesión
-
                     </button>
 
                 </section>
 
             </main>
-
         );
-
     }
-
 
     return (
 
@@ -231,255 +339,311 @@ function Profile() {
 
             <section className="profile-card">
 
-
-                {/* Encabezado */}
                 <div className="profile-header">
 
-                    <UserCircle size={70} />
+                    <UserCircle size={ 76 } />
 
                     <div>
+                        <span className="profile-label">
+                            Cuenta personal
+                        </span>
 
                         <h1>
                             Mi perfil
                         </h1>
 
                         <p>
-                            Información de tu cuenta
+                            Administra tu información y seguridad.
                         </p>
-
                     </div>
 
                 </div>
 
+                <section className="profile-section">
 
+                    <div className="section-title">
+                        <UserCircle size={ 20 } />
 
-                {
+                        <div>
+                            <h2>
+                                Información personal
+                            </h2>
 
-                    !editando ? (
+                            <p>
+                                Puedes actualizar cada dato por separado.
+                            </p>
+                        </div>
+                    </div>
 
-                        <>
+                    <div className="profile-field-card">
 
+                        <div className="profile-field-content">
 
-                            {/* Información del usuario */}
-                            <div className="profile-info">
+                            <UserCircle size={ 22 } />
 
+                            <div>
+                                <span>
+                                    Nombre
+                                </span>
 
-                                {/* Nombre */}
-                                <div className="profile-field">
-
-                                    <UserCircle size={22} />
-
-                                    <div>
-
-                                        <span>
-                                            Nombre
-                                        </span>
-
-                                        <strong>
-                                            {usuario.nombre}
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                {/* Correo */}
-                                <div className="profile-field">
-
-                                    <Mail size={22} />
-
-                                    <div>
-
-                                        <span>
-                                            Correo electrónico
-                                        </span>
-
-                                        <strong>
-                                            {usuario.correo}
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                {/* Contraseña */}
-                                <div className="profile-field">
-
-                                    <Lock size={22} />
-
-                                    <div>
-
-                                        <span>
-                                            Contraseña
-                                        </span>
-
-                                        <strong>
-                                            ••••••••
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-
+                                <strong>
+                                    {usuario.nombre}
+                                </strong>
                             </div>
-
-
-
-                            {/* Botones */}
-                            <div className="profile-actions">
-
-                                <button
-                                    className="edit-profile-button"
-                                    onClick={comenzarEdicion}
-                                >
-
-                                    <Pencil size={18} />
-
-                                    Editar perfil
-
-                                </button>
-
-
-                                <button
-                                    className="logout-profile-button"
-                                    onClick={cerrarSesion}
-                                >
-
-                                    <LogOut size={18} />
-
-                                    Cerrar sesión
-
-                                </button>
-
-                            </div>
-
-
-                        </>
-
-                    ) : (
-
-
-                        /* Formulario de edición */
-                        <div className="profile-edit">
-
-
-                            <div className="profile-input">
-
-                                <UserCircle size={20} />
-
-                                <input
-                                    type="text"
-                                    value={nombre}
-                                    onChange={(e) =>
-                                        setNombre(e.target.value)
-                                    }
-                                    placeholder="Nombre completo"
-                                />
-
-                            </div>
-
-
-
-                            <div className="profile-input">
-
-                                <Mail size={20} />
-
-                                <input
-                                    type="email"
-                                    value={correo}
-                                    onChange={(e) =>
-                                        setCorreo(e.target.value)
-                                    }
-                                    placeholder="Correo electrónico"
-                                />
-
-                            </div>
-
-
-
-                            <div className="profile-input">
-
-                                <Lock size={20} />
-
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                    placeholder="Nueva contraseña"
-                                />
-
-                            </div>
-
-
-
-                            <div className="profile-input">
-
-                                <Lock size={20} />
-
-                                <input
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) =>
-                                        setConfirmPassword(e.target.value)
-                                    }
-                                    placeholder="Confirmar nueva contraseña"
-                                />
-
-                            </div>
-
-
-
-                            <div className="profile-actions">
-
-
-                                <button
-                                    className="save-profile-button"
-                                    onClick={guardarCambios}
-                                >
-
-                                    <Save size={18} />
-
-                                    Guardar cambios
-
-                                </button>
-
-
-                                <button
-                                    className="cancel-profile-button"
-                                    onClick={cancelarEdicion}
-                                >
-
-                                    <X size={18} />
-
-                                    Cancelar
-
-                                </button>
-
-
-                            </div>
-
 
                         </div>
 
-                    )
+                        <div className="profile-edit-row">
 
-                }
+                            <input
+                                type="text"
+                                value={ nombre }
+                                onChange={ ( e ) =>
+                                    setNombre( e.target.value )
+                                }
+                                placeholder="Nuevo nombre"
+                            />
 
+                            <button
+                                className="save-small-button"
+                                onClick={ guardarNombre }
+                            >
+                                <Save size={ 17 } />
+                                Guardar
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div className="profile-field-card">
+
+                        <div className="profile-field-content">
+
+                            <Mail size={ 22 } />
+
+                            <div>
+                                <span>
+                                    Correo electrónico
+                                </span>
+
+                                <strong>
+                                    {usuario.correo}
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div className="profile-edit-row">
+
+                            <input
+                                type="email"
+                                value={ correo }
+                                onChange={ ( e ) =>
+                                    setCorreo( e.target.value )
+                                }
+                                placeholder="Nuevo correo"
+                            />
+
+                            <button
+                                className="save-small-button"
+                                onClick={ guardarCorreo }
+                            >
+                                <Save size={ 17 } />
+                                Guardar
+                            </button>
+
+                        </div>
+
+                        <div className="profile-password-row">
+
+                            <Lock size={ 20 } />
+
+                            <input
+                                type={
+                                    mostrarActual
+                                        ? "text"
+                                        : "password"
+                                }
+                                value={ passwordActual }
+                                onChange={ ( e ) =>
+                                    setPasswordActual( e.target.value )
+                                }
+                                placeholder="Contraseña actual"
+                            />
+
+                            <button
+                                type="button"
+                                className="eye-button"
+                                onClick={ () =>
+                                    setMostrarActual( !mostrarActual )
+                                }
+                            >
+                                {mostrarActual
+                                    ? <EyeOff size={ 18 } />
+                                    : <Eye size={ 18 } />
+                                }
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section className="profile-section security-section">
+
+                    <div className="section-title">
+                        <Lock size={ 20 } />
+
+                        <div>
+                            <h2>
+                                Seguridad
+                            </h2>
+
+                            <p>
+                                Cambia tu contraseña cuando lo necesites.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="profile-password-row">
+
+                        <Lock size={ 20 } />
+
+                        <input
+                            type={
+                                mostrarNueva
+                                    ? "text"
+                                    : "password"
+                            }
+                            value={ nuevaPassword }
+                            onChange={ ( e ) =>
+                                setNuevaPassword( e.target.value )
+                            }
+                            placeholder="Nueva contraseña"
+                        />
+
+                        <button
+                            type="button"
+                            className="eye-button"
+                            onClick={ () =>
+                                setMostrarNueva( !mostrarNueva )
+                            }
+                        >
+                            {mostrarNueva
+                                ? <EyeOff size={ 18 } />
+                                : <Eye size={ 18 } />
+                            }
+                        </button>
+
+                    </div>
+
+                    <div className="profile-password-row">
+
+                        <Lock size={ 20 } />
+
+                        <input
+                            type={
+                                mostrarConfirmacion
+                                    ? "text"
+                                    : "password"
+                            }
+                            value={ confirmarPassword }
+                            onChange={ ( e ) =>
+                                setConfirmarPassword( e.target.value )
+                            }
+                            placeholder="Confirmar nueva contraseña"
+                        />
+
+                        <button
+                            type="button"
+                            className="eye-button"
+                            onClick={ () =>
+                                setMostrarConfirmacion(
+                                    !mostrarConfirmacion
+                                )
+                            }
+                        >
+                            {mostrarConfirmacion
+                                ? <EyeOff size={ 18 } />
+                                : <Eye size={ 18 } />
+                            }
+                        </button>
+
+                    </div>
+
+                    <div className="security-actions">
+
+                        <div className="current-password-row">
+
+                            <Lock size={ 20 } />
+
+                            <input
+                                type="password"
+                                value={ passwordActual }
+                                onChange={ ( e ) =>
+                                    setPasswordActual( e.target.value )
+                                }
+                                placeholder="Contraseña actual"
+                            />
+
+                        </div>
+
+                        <button
+                            className="save-password-button"
+                            onClick={ cambiarPassword }
+                        >
+                            <Save size={ 17 } />
+                            Cambiar contraseña
+                        </button>
+
+                    </div>
+
+                </section>
+
+                <section className="profile-danger-zone">
+
+                    <div>
+                        <h2>
+                            Zona de cuenta
+                        </h2>
+
+                        <p>
+                            Estas acciones afectan permanentemente tu cuenta.
+                        </p>
+                    </div>
+
+                    <div className="profile-danger-actions">
+
+                        <button
+                            className="logout-profile-button"
+                            onClick={ cerrarSesion }
+                        >
+                            <LogOut size={ 18 } />
+                            Cerrar sesión
+                        </button>
+
+                        <button
+                            className="delete-profile-button"
+                            onClick={ borrarCuenta }
+                            disabled={ borrandoCuenta }
+                        >
+                            <Trash2 size={ 18 } />
+                            {borrandoCuenta
+                                ? "Eliminando..."
+                                : "Borrar cuenta"
+                            }
+                        </button>
+
+                    </div>
+
+                </section>
 
             </section>
 
         </main>
-
     );
-
 }
-
 
 export default Profile;

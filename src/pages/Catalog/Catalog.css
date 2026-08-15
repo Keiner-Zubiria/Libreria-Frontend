@@ -2,7 +2,7 @@
 
     padding: 40px 60px;
 
-    background: #F9FAFB;
+    background: var(--color-fondo);
 
     min-height: 80vh;
 
@@ -21,7 +21,7 @@
 
     font-size: 36px;
 
-    color: #111827;
+    color: var(--color-texto);
 
 }
 
@@ -30,7 +30,7 @@
 
     margin-top: 10px;
 
-    color: #6B7280;
+    color: var(--color-texto-suave);
 
     font-size: 17px;
 
@@ -43,7 +43,7 @@
 
     margin-bottom: 20px;
 
-    color: #374151;
+    color: var(--color-texto-suave);
 
     font-weight: 600;
 

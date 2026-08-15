@@ -15,6 +15,8 @@ import
 
 import CartContext from "../../context/CartContext";
 import AuthContext from "../../context/AuthContext";
+import AlertContext from "../../context/AlertContext";
+import { API_URL, UPLOADS_URL, authFetch } from "../../config/api";
 
 
 // Página para finalizar una compra.
@@ -28,6 +30,8 @@ function Checkout()
     const { cart, clearCart } = useContext( CartContext );
 
     const { usuario } = useContext( AuthContext );
+
+    const { mostrarMensaje } = useContext(AlertContext);
 
 
     // Datos que llegan desde "Comprar ahora".
@@ -92,6 +96,20 @@ function Checkout()
 
     const [ metodoPago, setMetodoPago ] = useState( "" );
 
+    // Datos del pago con tarjeta o PSE.
+    const [ titularTarjeta, setTitularTarjeta ] = useState( "" );
+
+    const [ numeroTarjeta, setNumeroTarjeta ] = useState( "" );
+
+    const [ vencimientoTarjeta, setVencimientoTarjeta ] = useState( "" );
+
+    const [ cvvTarjeta, setCvvTarjeta ] = useState( "" );
+
+    const [ banco, setBanco ] = useState( "" );
+
+    // Indica si el pago se está procesando.
+    const [ procesando, setProcesando ] = useState( false );
+
 
     // Calcula el total.
     const total = productos.reduce(
@@ -106,7 +124,7 @@ function Checkout()
 
 
     // Confirma el pedido.
-    const confirmarPedido = ( e ) =>
+    const confirmarPedido = async ( e ) =>
     {
 
         e.preventDefault();
@@ -116,11 +134,7 @@ function Checkout()
         if ( !usuario )
         {
 
-            alert(
-
-                "Debes iniciar sesión para realizar la compra."
-
-            );
+            mostrarMensaje( "Debes iniciar sesión para realizar la compra.", "warning" );
 
             navigate( "/login" );
 
@@ -133,12 +147,7 @@ function Checkout()
         if ( productos.length === 0 )
         {
 
-            alert(
-
-                "No hay productos para realizar la compra."
-
-            );
-
+            mostrarMensaje( "Tu carrito está vacío.", "warning" );
             navigate( "/catalogo" );
 
             return;
@@ -156,10 +165,9 @@ function Checkout()
         )
         {
 
-            alert(
-
-                "El pago contraentrega no está disponible para este pedido."
-
+            mostrarMensaje(
+                "El pago contraentrega no está disponible para este pedido.",
+                "warning"
             );
 
             return;
@@ -182,10 +190,9 @@ function Checkout()
             )
             {
 
-                alert(
-
-                    "Completa todos los datos de entrega."
-
+                mostrarMensaje(
+                    "Completa todos los datos de entrega.",
+                    "warning"
                 );
 
                 return;
@@ -199,10 +206,9 @@ function Checkout()
         if ( !metodoPago )
         {
 
-            alert(
-
-                "Selecciona un método de pago."
-
+            mostrarMensaje(
+                "Selecciona un método de pago.",
+                "warning"
             );
 
             return;
@@ -210,179 +216,178 @@ function Checkout()
         }
 
 
-        // Recupera los pedidos existentes.
-        const pedidos = JSON.parse(
-
-            localStorage.getItem( "pedidos" )
-
-        ) || [];
-
-
-        // Genera el siguiente número de pedido.
-        const nuevoId = pedidos.length + 1;
-
-
-        // Crea el pedido.
-        const nuevoPedido = {
-
-            id: String( nuevoId ).padStart( 4, "0" ),
-
-            fecha: new Date().toLocaleDateString(
-
-                "es-CO",
-
-                {
-
-                    day: "2-digit",
-
-                    month: "2-digit",
-
-                    year: "numeric"
-
-                }
-
-            ),
-
-            estado: "Pendiente",
-
-            usuario: {
-
-                ...usuario,
-
-                telefono,
-
-                direccion,
-
-                ciudad
-
-            },
-
-            productos: productos.map( ( item ) => ( {
-
-                id: item.id,
-
-                titulo: item.titulo,
-
-                precio: item.precio,
-
-                quantity: item.quantity,
-
-                formato: item.formato || "Fisico",
-
-                imagen: item.imagen
-
-            } ) ),
-
-            total,
-
-            metodoPago
-
-        };
-
-
-        // Recupera los libros guardados.
-        const librosGuardados = JSON.parse(
-
-            localStorage.getItem( "libros" )
-
-        ) || [];
-
-
-        // Actualiza stock y cantidad de vendidos.
-        const librosActualizados = librosGuardados.map( ( libro ) =>
+        // Valida los datos de la tarjeta si ese método fue elegido.
+        if ( metodoPago === "Tarjeta" )
         {
 
-            const productoComprado = productos.find(
+            const numeroLimpio =
+                numeroTarjeta.replaceAll( " ", "" );
 
-                ( item ) =>
-
-                    item.id === libro.id &&
-
-                    item.formato === "Fisico"
-
-            );
-
-
-            // Si el libro físico fue comprado,
-            // reduce el stock y aumenta los vendidos.
-            if ( productoComprado )
+            if ( numeroLimpio.length < 13 )
             {
 
-                return {
+                mostrarMensaje(
+                    "Ingresa un número de tarjeta válido.",
+                    "warning"
+                );
 
-                    ...libro,
-
-                    stock: Math.max(
-
-                        0,
-
-                        ( libro.stock || 0 ) -
-
-                        productoComprado.quantity
-
-                    ),
-
-                    vendidos:
-
-                        ( libro.vendidos || 0 ) +
-
-                        productoComprado.quantity
-
-                };
+                return;
 
             }
 
+            if ( !titularTarjeta )
+            {
 
-            // Si es virtual o no fue comprado,
-            // se conserva sin modificar.
-            return libro;
+                mostrarMensaje(
+                    "Ingresa el nombre del titular de la tarjeta.",
+                    "warning"
+                );
 
-        } );
+                return;
 
+            }
 
-        // Guarda los libros actualizados.
-        localStorage.setItem(
+            if ( !vencimientoTarjeta )
+            {
 
-            "libros",
+                mostrarMensaje(
+                    "Ingresa la fecha de vencimiento de la tarjeta.",
+                    "warning"
+                );
 
-            JSON.stringify( librosActualizados )
+                return;
 
-        );
+            }
 
+            if ( cvvTarjeta.length < 3 )
+            {
 
-        // Guarda el pedido.
-        const nuevosPedidos = [
+                mostrarMensaje(
+                    "Ingresa el código de seguridad de la tarjeta.",
+                    "warning"
+                );
 
-            ...pedidos,
+                return;
 
-            nuevoPedido
-
-        ];
-
-
-        localStorage.setItem(
-
-            "pedidos",
-
-            JSON.stringify( nuevosPedidos )
-
-        );
-
-
-        // Si la compra proviene del carrito,
-        // se vacía después de confirmar.
-        if ( !compraDirecta )
-        {
-
-            clearCart();
+            }
 
         }
 
 
-        // Redirige a Mis pedidos.
-        navigate( "/pedidos" );
+        // Valida el banco si el método elegido es PSE.
+        if ( metodoPago === "PSE" && !banco )
+        {
 
-    };
+            mostrarMensaje(
+                "Selecciona un banco para el pago.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        // Evita enviar el pedido dos veces mientras se procesa.
+        if ( procesando )
+        {
+
+            return;
+
+        }
+
+
+        setProcesando( true );
+
+        try
+        {
+
+            const pedido = {
+
+                usuarioId: usuario.id,
+
+                telefono,
+                direccion,
+                ciudad,
+
+                metodoPago,
+
+                titularTarjeta,
+                numeroTarjeta,
+                vencimientoTarjeta,
+                cvvTarjeta,
+
+                banco,
+
+                productos: productos.map( item => ( {
+
+                    id: item.id,
+                    quantity: item.quantity,
+                    formato: item.formato
+
+                } ) )
+
+            };
+
+            // Simula el tiempo que tarda una pasarela de pago real.
+            await new Promise( resolve =>
+                setTimeout( resolve, 1200 )
+            );
+
+            const response = await authFetch( `${API_URL}/pedidos`, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify( pedido )
+
+            } );
+
+            if ( !response.ok )
+            {
+
+                const mensaje = await response.text();
+
+                throw new Error( mensaje );
+
+            }
+
+            // Usa el id del pedido creado para la página de confirmación.
+            const pedidoCreado = await response.json();
+
+            if ( !compraDirecta )
+            {
+
+                clearCart();
+
+            }
+
+            navigate(
+                `/confirmacion/${ pedidoCreado.id }`
+            );
+
+        }
+        catch ( error )
+        {
+
+            console.error( error );
+
+            mostrarMensaje(
+                error.message,
+                "error"
+            );
+
+        }
+        finally
+        {
+
+            setProcesando( false );
+
+        }
+    }
 
 
     return (
@@ -391,6 +396,8 @@ function Checkout()
 
             <section className="checkout-container">
 
+
+                {/* Encabezado */ }
                 <div className="checkout-header">
 
                     <Package size={ 32 } />
@@ -422,14 +429,15 @@ function Checkout()
 
                 >
 
+
                     {
 
                         contieneFisico && (
 
                             <div className="checkout-left">
 
-                                {/* Datos de entrega */ }
 
+                                {/* Datos de entrega */ }
                                 <section className="checkout-section">
 
                                     <h2>
@@ -451,7 +459,11 @@ function Checkout()
 
                                             type="text"
 
-                                            value={ usuario?.nombre || "" }
+                                            value={
+
+                                                usuario?.nombre || ""
+
+                                            }
 
                                             disabled
 
@@ -472,7 +484,11 @@ function Checkout()
 
                                             type="email"
 
-                                            value={ usuario?.correo || "" }
+                                            value={
+
+                                                usuario?.correo || ""
+
+                                            }
 
                                             disabled
 
@@ -501,7 +517,11 @@ function Checkout()
 
                                             onChange={ ( e ) =>
 
-                                                setTelefono( e.target.value )
+                                                setTelefono(
+
+                                                    e.target.value
+
+                                                )
 
                                             }
 
@@ -530,7 +550,11 @@ function Checkout()
 
                                             onChange={ ( e ) =>
 
-                                                setDireccion( e.target.value )
+                                                setDireccion(
+
+                                                    e.target.value
+
+                                                )
 
                                             }
 
@@ -557,7 +581,11 @@ function Checkout()
 
                                             onChange={ ( e ) =>
 
-                                                setCiudad( e.target.value )
+                                                setCiudad(
+
+                                                    e.target.value
+
+                                                )
 
                                             }
 
@@ -575,7 +603,6 @@ function Checkout()
 
 
                     {/* Resumen */ }
-
                     <section className="checkout-summary">
 
                         <h2>
@@ -603,13 +630,31 @@ function Checkout()
 
                                             className="checkout-product"
 
-                                            key={ `${ item.id }-${ item.formato }` }
+                                            key={
+
+                                                `${ item.id }-${ item.formato }`
+
+                                            }
 
                                         >
 
+
+                                            {/* Imagen */ }
                                             <img
 
-                                                src={ item.imagen }
+                                                src={
+
+                                                    item.imagen
+
+                                                        ?
+
+                                                        `${UPLOADS_URL}/${ item.imagen }`
+
+                                                        :
+
+                                                        "/images/default-book.jpg"
+
+                                                }
 
                                                 alt={ item.titulo }
 
@@ -631,19 +676,36 @@ function Checkout()
 
                                                         esVirtual
 
-                                                            ? <Monitor size={ 16 } />
+                                                            ?
 
-                                                            : <Package size={ 16 } />
+                                                            <Monitor
+
+                                                                size={ 16 }
+
+                                                            />
+
+                                                            :
+
+                                                            <Package
+
+                                                                size={ 16 }
+
+                                                            />
 
                                                     }
+
 
                                                     {
 
                                                         esVirtual
 
-                                                            ? "Virtual"
+                                                            ?
 
-                                                            : "Físico"
+                                                            "Virtual"
+
+                                                            :
+
+                                                            "Físico"
 
                                                     }
 
@@ -679,7 +741,11 @@ function Checkout()
 
                                                         item.quantity
 
-                                                    ).toLocaleString( "es-CO" )
+                                                    ).toLocaleString(
+
+                                                        "es-CO"
+
+                                                    )
 
                                                 }
 
@@ -696,6 +762,7 @@ function Checkout()
                         </div>
 
 
+                        {/* Total */ }
                         <div className="checkout-total">
 
                             <span>
@@ -710,7 +777,11 @@ function Checkout()
 
                                 {
 
-                                    total.toLocaleString( "es-CO" )
+                                    total.toLocaleString(
+
+                                        "es-CO"
+
+                                    )
 
                                 }
 
@@ -719,6 +790,7 @@ function Checkout()
                         </div>
 
 
+                        {/* Método de pago */ }
                         <div className="checkout-payment">
 
                             <h3>
@@ -730,6 +802,7 @@ function Checkout()
 
                             <div className="payment-options">
 
+
                                 {
 
                                     contraentregaDisponible && (
@@ -740,9 +813,13 @@ function Checkout()
 
                                                 metodoPago === "Contraentrega"
 
-                                                    ? "payment-option selected"
+                                                    ?
 
-                                                    : "payment-option"
+                                                    "payment-option selected"
+
+                                                    :
+
+                                                    "payment-option"
 
                                             }
 
@@ -758,7 +835,9 @@ function Checkout()
 
                                                 checked={
 
-                                                    metodoPago === "Contraentrega"
+                                                    metodoPago ===
+
+                                                    "Contraentrega"
 
                                                 }
 
@@ -797,9 +876,13 @@ function Checkout()
 
                                         metodoPago === "Tarjeta"
 
-                                            ? "payment-option selected"
+                                            ?
 
-                                            : "payment-option"
+                                            "payment-option selected"
+
+                                            :
+
+                                            "payment-option"
 
                                     }
 
@@ -850,9 +933,13 @@ function Checkout()
 
                                         metodoPago === "PSE"
 
-                                            ? "payment-option selected"
+                                            ?
 
-                                            : "payment-option"
+                                            "payment-option selected"
+
+                                            :
+
+                                            "payment-option"
 
                                     }
 
@@ -901,17 +988,269 @@ function Checkout()
                         </div>
 
 
+                        {/* Formulario de la tarjeta */ }
+                        {
+                            metodoPago === "Tarjeta" && (
+
+                                <div className="card-payment-fields">
+
+                                    <div className="checkout-field">
+
+                                        <label>
+
+                                            Nombre del titular
+
+                                        </label>
+
+                                        <input
+
+                                            type="text"
+
+                                            placeholder="Nombre como aparece en la tarjeta"
+
+                                            value={ titularTarjeta }
+
+                                            onChange={ ( e ) =>
+
+                                                setTitularTarjeta(
+
+                                                    e.target.value
+
+                                                )
+
+                                            }
+
+                                        />
+
+                                    </div>
+
+                                    <div className="checkout-field">
+
+                                        <label>
+
+                                            Número de tarjeta
+
+                                        </label>
+
+                                        <input
+
+                                            type="text"
+
+                                            inputMode="numeric"
+
+                                            placeholder="1234 5678 9012 3456"
+
+                                            maxLength={ 19 }
+
+                                            value={ numeroTarjeta }
+
+                                            onChange={ ( e ) =>
+
+                                                setNumeroTarjeta(
+
+                                                    e.target.value
+
+                                                )
+
+                                            }
+
+                                        />
+
+                                    </div>
+
+                                    <div className="card-fields-row">
+
+                                        <div className="checkout-field">
+
+                                            <label>
+
+                                                Vencimiento
+
+                                            </label>
+
+                                            <input
+
+                                                type="text"
+
+                                                placeholder="MM/AA"
+
+                                                maxLength={ 5 }
+
+                                                value={ vencimientoTarjeta }
+
+                                                onChange={ ( e ) =>
+
+                                                    setVencimientoTarjeta(
+
+                                                        e.target.value
+
+                                                    )
+
+                                                }
+
+                                            />
+
+                                        </div>
+
+                                        <div className="checkout-field">
+
+                                            <label>
+
+                                                CVV
+
+                                            </label>
+
+                                            <input
+
+                                                type="password"
+
+                                                inputMode="numeric"
+
+                                                placeholder="123"
+
+                                                maxLength={ 4 }
+
+                                                value={ cvvTarjeta }
+
+                                                onChange={ ( e ) =>
+
+                                                    setCvvTarjeta(
+
+                                                        e.target.value
+
+                                                    )
+
+                                                }
+
+                                            />
+
+                                        </div>
+
+                                    </div>
+
+                                    <p className="simulated-payment-note">
+
+                                        Pago de demostración: no se hace
+                                        ningún cobro real.
+
+                                    </p>
+
+                                </div>
+
+                            )
+                        }
+
+
+                        {/* Selección de banco para PSE */ }
+                        {
+                            metodoPago === "PSE" && (
+
+                                <div className="card-payment-fields">
+
+                                    <div className="checkout-field">
+
+                                        <label>
+
+                                            Banco
+
+                                        </label>
+
+                                        <select
+
+                                            value={ banco }
+
+                                            onChange={ ( e ) =>
+
+                                                setBanco(
+
+                                                    e.target.value
+
+                                                )
+
+                                            }
+
+                                        >
+
+                                            <option value="">
+
+                                                Selecciona un banco
+
+                                            </option>
+
+                                            <option value="Bancolombia">
+
+                                                Bancolombia
+
+                                            </option>
+
+                                            <option value="Davivienda">
+
+                                                Davivienda
+
+                                            </option>
+
+                                            <option value="BBVA">
+
+                                                BBVA
+
+                                            </option>
+
+                                            <option value="Banco de Bogotá">
+
+                                                Banco de Bogotá
+
+                                            </option>
+
+                                            <option value="Nequi">
+
+                                                Nequi
+
+                                            </option>
+
+                                            <option value="Daviplata">
+
+                                                Daviplata
+
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <p className="simulated-payment-note">
+
+                                        Pago de demostración: no se hace
+                                        ningún cobro real.
+
+                                    </p>
+
+                                </div>
+
+                            )
+                        }
+
+
+                        {/* Confirmar pedido */ }
                         <button
 
                             type="submit"
 
                             className="confirm-order-button"
 
+                            disabled={ procesando }
+
                         >
 
                             <ShoppingBag size={ 20 } />
 
-                            Confirmar pedido
+                            {
+                                procesando
+
+                                    ? "Procesando pago..."
+
+                                    : "Confirmar pedido"
+
+                            }
 
                         </button>
 

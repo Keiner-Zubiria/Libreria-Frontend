@@ -1,199 +1,125 @@
 import "./Login.css";
 
-import { useState, useContext, useEffect } from "react";
+import {
+    useState,
+    useContext,
+    useEffect
+} from "react";
 
-import
-{
+import {
     Link,
     useNavigate
 } from "react-router-dom";
 
-import
-{
+import {
     Mail,
-    Lock
+    Lock,
+    Eye,
+    EyeOff
 } from "lucide-react";
 
 import AuthContext from "../../context/AuthContext";
+import AlertContext from "../../context/AlertContext.jsx";
+import { API_URL } from "../../config/api";
 
 
 // Página de inicio de sesión.
 function Login()
 {
-
     const navigate = useNavigate();
 
     const { usuario, login } = useContext( AuthContext );
-
+    const { mostrarMensaje } = useContext( AlertContext );
 
     const [ correo, setCorreo ] = useState( "" );
-
     const [ password, setPassword ] = useState( "" );
-
-
+    const [ mostrarPassword, setMostrarPassword ] = useState( false );
 
     // Si ya existe una sesión, no permite entrar al login.
     useEffect( () =>
     {
-
         if ( usuario )
         {
-
             navigate( "/", { replace: true } );
-
         }
-
     }, [ usuario, navigate ] );
 
-
-
-    const handleSubmit = ( e ) =>
+    // Inicia sesión mediante la base de datos.
+    const handleSubmit = async ( e ) =>
     {
-
         e.preventDefault();
-
 
         if ( !correo || !password )
         {
-
-            alert(
-
-                "Completa todos los campos."
-
+            mostrarMensaje(
+                "Completa todos los campos.",
+                "warning"
             );
 
             return;
-
         }
 
-
-
-        // Cuenta de administrador de prueba.
-        if (
-            correo === "admin@gmail.com" &&
-            password === "admin"
-        )
+        try
         {
-            const administrador = {
-
-                nombre: "Administrador",
-
-                correo: "admin@gmail.com",
-
-                password: "admin",
-
-                rol: "admin"
-
-            };
-
-
-            login( administrador );
-
-
-            alert(
-
-                "Bienvenido Administrador."
-
+            const response = await fetch(
+                `${API_URL}/usuarios/login`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(
+                        {
+                            correo,
+                            password
+                        }
+                    )
+                }
             );
 
+            if ( !response.ok )
+            {
+                const mensaje = await response.text();
 
-            navigate( "/admin" );
+                mostrarMensaje(
+                    mensaje,
+                    "error"
+                );
 
+                return;
+            }
 
-            return;
+            const respuesta = await response.json();
 
+            login(
+                respuesta.token,
+                respuesta.usuario
+            );
+
+            mostrarMensaje(
+                `Bienvenido ${ respuesta.usuario.nombre }.`,
+                "success"
+            );
+
+            if ( respuesta.usuario.rol === "administrador" )
+            {
+                navigate( "/admin" );
+            }
+            else
+            {
+                navigate( "/" );
+            }
         }
-
-
-
-        // Recupera los usuarios registrados.
-        const usuarios = JSON.parse(
-
-            localStorage.getItem( "usuarios" )
-
-        ) || [];
-
-
-
-        // Busca el usuario por correo.
-        const usuarioEncontrado = usuarios.find(
-
-            ( u ) =>
-
-                u.correo === correo
-
-        );
-
-
-
-        if ( !usuarioEncontrado )
+        catch ( error )
         {
+            console.error( error );
 
-            alert(
-
-                "No existe una cuenta con ese correo."
-
+            mostrarMensaje(
+                "No se pudo conectar con el servidor.",
+                "error"
             );
-
-            return;
-
         }
-
-
-
-        if (
-
-            usuarioEncontrado.password !== password
-
-        )
-        {
-
-            alert(
-
-                "Contraseña incorrecta."
-
-            );
-
-            return;
-
-        }
-
-
-
-        // Si una cuenta antigua no tiene rol,
-        // se considera usuario normal.
-        const usuarioSesion = {
-
-            ...usuarioEncontrado,
-
-            rol:
-
-                usuarioEncontrado.rol ||
-
-                "usuario"
-
-        };
-
-
-
-        // Inicia la sesión mediante AuthContext.
-        login( usuarioSesion );
-
-
-
-        alert(
-
-            `Bienvenido ${ usuarioSesion.nombre }.`
-
-        );
-
-
-
-        navigate( "/" );
-
     };
-
-
 
     return (
 
@@ -201,140 +127,105 @@ function Login()
 
             <section className="login-card">
 
-
                 <h1>
-
                     Letras Mágicas
-
                 </h1>
 
 
                 <h2>
-
-                    Inicia sesión con cuenta de prueba
-
+                    Login
                 </h2>
-
-
-                <h2> 
-                    
-                    admin@gmail.com
-
-                </h2>
-
-
-                <h2>
-                    
-                    admin
-                    
-                </h2>
-
 
                 <form
-
                     className="login-form"
-
                     onSubmit={ handleSubmit }
-
                 >
-
 
                     <div className="input-group">
 
                         <Mail size={ 20 } />
 
-
                         <input
-
-                            type="text"
-
+                            type="email"
                             placeholder="Correo electrónico"
-
                             value={ correo }
-
                             onChange={ ( e ) =>
-
-                                setCorreo(
-
-                                    e.target.value
-
-                                )
-
+                                setCorreo( e.target.value )
                             }
-
+                            required
                         />
 
                     </div>
 
-
-
-                    <div className="input-group">
+                    <div className="input-group password-group">
 
                         <Lock size={ 20 } />
 
-
                         <input
-
-                            type="password"
-
-                            placeholder="Contraseña"
-
-                            value={ password }
-
-                            onChange={ ( e ) =>
-
-                                setPassword(
-
-                                    e.target.value
-
-                                )
-
+                            type={
+                                mostrarPassword
+                                    ? "text"
+                                    : "password"
                             }
-
+                            placeholder="Contraseña"
+                            value={ password }
+                            onChange={ ( e ) =>
+                                setPassword( e.target.value )
+                            }
+                            required
                         />
+
+                        <button
+                            type="button"
+                            className="password-toggle"
+                            onClick={ () =>
+                                setMostrarPassword( !mostrarPassword )
+                            }
+                            aria-label={
+                                mostrarPassword
+                                    ? "Ocultar contraseña"
+                                    : "Mostrar contraseña"
+                            }
+                        >
+                            {mostrarPassword
+                                ? <EyeOff size={ 20 } />
+                                : <Eye size={ 20 } />
+                            }
+                        </button>
 
                     </div>
 
-
-
                     <button
-
                         type="submit"
-
                         className="login-button"
-
                     >
-
                         Iniciar sesión
-
                     </button>
-
 
                 </form>
 
+                <p className="login-recuperar">
 
-
-                <p className="login-footer">
-
-                    ¿No tienes cuenta?{ " " }
-
-
-                    <Link to="/registro">
-
-                        Crear cuenta
-
+                    <Link to="/recuperar">
+                        ¿Olvidaste tu contraseña?
                     </Link>
 
                 </p>
 
+                <p className="login-footer">
+
+                    ¿No tienes cuenta?{" "}
+
+                    <Link to="/registro">
+                        Crear cuenta
+                    </Link>
+
+                </p>
 
             </section>
 
         </main>
-
     );
-
 }
-
 
 export default Login;

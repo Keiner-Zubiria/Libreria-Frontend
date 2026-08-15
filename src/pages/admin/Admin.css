@@ -1,7 +1,7 @@
 .admin-page {
     min-height: 80vh;
     padding: 50px 25px;
-    background: #F8FAFC;
+    background: var(--color-fondo);
 }
 
 /* Estructura principal del panel */
@@ -18,11 +18,12 @@
 .admin-sidebar {
     width: 250px;
     flex-shrink: 0;
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--color-superficie);
+    border: 1px solid var(--color-borde);
     border-radius: 20px;
     padding: 25px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--color-sombra);
+    transition: background-color .3s ease, border-color .3s ease;
 }
 
 .admin-brand {
@@ -38,7 +39,7 @@
 
 .admin-brand h2 {
     margin: 0;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 20px;
 }
 
@@ -49,7 +50,7 @@
     gap: 12px;
     padding: 12px 15px;
     text-decoration: none;
-    color: #6B7280;
+    color: var(--color-texto-suave);
     font-size: 15px;
     border-radius: 12px;
     transition: 0.2s;
@@ -64,7 +65,7 @@
     border: none;
     border-radius: 12px;
     background: transparent;
-    color: #6B7280;
+    color: var(--color-texto-suave);
     font-size: 15px;
     cursor: pointer;
     transition: .2s;
@@ -72,7 +73,7 @@
 
 .admin-menu button:hover,
 .admin-menu .active {
-    background: #EFF6FF;
+    background: var(--color-primario-suave);
     color: #2563EB;
 }
 
@@ -87,13 +88,13 @@
 
 .admin-header h1 {
     margin: 0;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 30px;
 }
 
 .admin-header p {
     margin-top: 8px;
-    color: #6B7280;
+    color: var(--color-texto-suave);
     font-size: 14px;
 }
 
@@ -109,10 +110,10 @@
     align-items: center;
     gap: 15px;
     padding: 25px;
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--color-superficie);
+    border: 1px solid var(--color-borde);
     border-radius: 16px;
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--color-sombra);
     transition: .2s;
 }
 
@@ -127,12 +128,12 @@
 
 .admin-card h2 {
     margin: 0;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 18px;
 }
 
 .admin-card span {
-    color: #6B7280;
+    color: var(--color-texto-suave);
     font-size: 13px;
 }
 

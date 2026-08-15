@@ -1,7 +1,7 @@
 .checkout-page {
     min-height: 70vh;
     padding: 50px 20px;
-    background: #F8FAFC;
+    background: var(--color-fondo);
 }
 
 .checkout-container {
@@ -23,13 +23,13 @@
 
 .checkout-header h1 {
     margin: 0;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 30px;
 }
 
 .checkout-header p {
     margin: 5px 0 0;
-    color: #6B7280;
+    color: var(--color-texto-suave);
     font-size: 14px;
 }
 
@@ -42,17 +42,18 @@
 
 .checkout-section,
 .checkout-summary {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--color-superficie);
+    border: 1px solid var(--color-borde);
     border-radius: 16px;
     padding: 25px;
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--color-sombra);
+    transition: background-color .3s ease, border-color .3s ease;
 }
 
 .checkout-section h2,
 .checkout-summary h2 {
     margin: 0 0 20px;
-    color: #111827;
+    color: var(--color-texto);
     font-size: 20px;
 }
 
@@ -67,7 +68,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #374151;
+    color: var(--color-texto-suave);
     font-size: 14px;
     font-weight: 500;
 }
@@ -81,11 +82,11 @@
     height: 45px;
     padding: 0 13px;
     box-sizing: border-box;
-    border: 1px solid #D1D5DB;
+    border: 1px solid var(--color-borde);
     border-radius: 9px;
     outline: none;
-    background: #FFFFFF;
-    color: #111827;
+    background: var(--color-entrada);
+    color: var(--color-texto);
     font-family: inherit;
     font-size: 14px;
     transition: 0.2s;
@@ -97,8 +98,8 @@
 }
 
 .checkout-field input:disabled {
-    background: #F3F4F6;
-    color: #6B7280;
+    background: var(--color-superficie-2);
+    color: var(--color-texto-suave);
     cursor: not-allowed;
 }
 
@@ -114,9 +115,9 @@
     gap: 10px;
     min-height: 48px;
     padding: 0 13px;
-    border: 1px solid #D1D5DB;
+    border: 1px solid var(--color-borde);
     border-radius: 9px;
-    color: #374151;
+    color: var(--color-texto-suave);
     font-size: 14px;
     cursor: pointer;
     transition: 0.2s;
@@ -124,12 +125,12 @@
 
 .payment-option:hover {
     border-color: #93C5FD;
-    background: #F8FAFF;
+    background: var(--color-primario-suave);
 }
 
 .payment-option.selected {
     border-color: #2563EB;
-    background: #EFF6FF;
+    background: var(--color-primario-suave);
     color: #1D4ED8;
 }
 
@@ -162,7 +163,7 @@
     align-items: center;
     gap: 12px;
     padding-bottom: 14px;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid var(--color-borde);
 }
 
 .checkout-product img {
@@ -179,12 +180,12 @@
 }
 
 .checkout-product strong {
-    color: #111827;
+    color: var(--color-texto);
     font-size: 13px;
 }
 
 .checkout-product span {
-    color: #6B7280;
+    color: var(--color-texto-suave);
     font-size: 12px;
 }
 
@@ -211,17 +212,17 @@
     justify-content: space-between;
     margin-top: 20px;
     padding-top: 18px;
-    border-top: 1px solid #E5E7EB;
+    border-top: 1px solid var(--color-borde);
 }
 
 .checkout-total span {
-    color: #374151;
+    color: var(--color-texto-suave);
     font-size: 16px;
     font-weight: 500;
 }
 
 .checkout-total strong {
-    color: #111827;
+    color: var(--color-texto);
     font-size: 22px;
 }
 
@@ -246,6 +247,45 @@
 
 .confirm-order-button:hover {
     background: #1D4ED8;
+}
+
+.confirm-order-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Campos de pago con tarjeta o PSE */
+.card-payment-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px solid var(--color-borde);
+    border-radius: 9px;
+    background: var(--color-superficie-2);
+}
+
+.card-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.simulated-payment-note {
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+
+    .card-fields-row {
+        grid-template-columns: 1fr;
+    }
+
 }
 
 @media (max-width: 850px) {
@@ -290,7 +330,7 @@
 }
 
 .checkout-products::-webkit-scrollbar-track {
-    background: #F3F4F6;
+    background: var(--color-superficie-2);
     border-radius: 20px;
 }
 

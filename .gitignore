@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Variables de entorno locales
+.env
+.env.*
+!.env.example
+
+# Archivos de respaldo y comprimidos
+*.zip
+*.rar
+*.7z
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

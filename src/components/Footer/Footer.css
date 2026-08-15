@@ -1,84 +1,116 @@
 .footer {
-    background: #111827;
-
-    color: white;
-
+    width: 100%;
     margin-top: 60px;
+    background: var(--color-navbar);
+    color: white;
+    transition: background-color .3s ease;
 }
-
 
 .footer-container {
-
+    width: 100%;
     max-width: 1400px;
-
-    margin: auto;
-
+    margin: 0 auto;
     padding: 50px 40px;
-
     display: grid;
-
     grid-template-columns: repeat(3, 1fr);
-
     gap: 40px;
+    box-sizing: border-box;
 }
-
 
 .footer-section h3 {
-
+    margin: 0 0 15px;
     font-size: 26px;
-
-    margin-bottom: 15px;
 }
-
 
 .footer-section h4 {
-
+    margin: 0 0 15px;
     font-size: 18px;
-
-    margin-bottom: 15px;
 }
-
 
 .footer-section p {
-
-    color: #D1D5DB;
-
     display: flex;
-
     align-items: center;
-
     gap: 10px;
-
-    margin-bottom: 12px;
+    margin: 0 0 12px;
+    color: #D1D5DB;
+    line-height: 1.6;
 }
-
 
 .footer-section a {
-
     display: block;
-
-    color: #D1D5DB;
-
-    text-decoration: none;
-
+    width: fit-content;
     margin-bottom: 10px;
+    color: #D1D5DB;
+    text-decoration: none;
+    transition: .3s;
 }
-
 
 .footer-section a:hover {
-
-    color: white;
-
+    color: #60A5FA;
 }
 
-
 .footer-bottom {
-
     border-top: 1px solid #374151;
-
-    text-align: center;
-
     padding: 20px;
-
     color: #9CA3AF;
+    text-align: center;
+}
+
+.footer-bottom p {
+    margin: 0;
+}
+
+/* Tablets */
+
+@media (max-width: 800px) {
+
+    .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 40px 25px;
+        gap: 30px;
+    }
+
+    .footer-section:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Celulares */
+
+@media (max-width: 550px) {
+
+    .footer {
+        margin-top: 40px;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        padding: 35px 20px;
+        gap: 28px;
+    }
+
+    .footer-section:first-child {
+        grid-column: auto;
+    }
+
+    .footer-section h3 {
+        font-size: 23px;
+    }
+
+    .footer-section h4 {
+        font-size: 17px;
+    }
+
+    .footer-section p {
+        font-size: 14px;
+    }
+
+    .footer-bottom {
+        padding: 16px 15px;
+    }
+
+    .footer-bottom p {
+        font-size: 13px;
+        line-height: 1.5;
+    }
 }

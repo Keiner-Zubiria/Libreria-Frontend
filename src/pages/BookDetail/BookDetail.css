@@ -12,7 +12,7 @@
 /* Contenedor principal del producto */
 .detail-container {
 
-    background: white;
+    background: var(--color-superficie);
 
     border-radius: 16px;
 
@@ -26,7 +26,9 @@
 
     border: 1px solid #2563EB;
 
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    box-shadow: var(--color-sombra);
+
+    transition: background-color .3s ease, box-shadow .3s ease;
 
 }
 
@@ -36,7 +38,7 @@
 
     height: 500px;
 
-    background: #F3F4F6;
+    background: var(--color-superficie-2);
 
     border-radius: 12px;
 
@@ -67,7 +69,7 @@
 
     font-size: 32px;
 
-    color: #111827;
+    color: var(--color-texto);
 
     margin-bottom: 15px;
 
@@ -76,7 +78,7 @@
 
 .detail-info h3 {
 
-    color: #6B7280;
+    color: var(--color-texto-suave);
 
     font-weight: 500;
 
@@ -98,7 +100,7 @@
 
     font-size: 32px;
 
-    color: #111827;
+    color: var(--color-texto);
 
     margin: 25px 0;
 
@@ -117,7 +119,7 @@
 
     display: block;
 
-    color: #374151;
+    color: var(--color-texto-suave);
 
     font-weight: 600;
 
@@ -147,11 +149,11 @@
 
     padding: 10px 18px;
 
-    border: 1px solid #D1D5DB;
+    border: 1px solid var(--color-borde);
 
-    background: white;
+    background: var(--color-entrada);
 
-    color: #374151;
+    color: var(--color-texto-suave);
 
     border-radius: 9px;
 
@@ -175,7 +177,7 @@
 
 .format-option.selected {
 
-    background: #EFF6FF;
+    background: var(--color-primario-suave);
 
     border-color: #2563EB;
 
@@ -189,7 +191,7 @@
 /* Disponibilidad */
 .detail-stock {
 
-    color: #4B5563;
+    color: var(--color-texto-suave);
 
     margin-bottom: 5px;
 
@@ -281,7 +283,7 @@
 
     margin-top: 30px;
 
-    background: white;
+    background: var(--color-superficie);
 
     padding: 30px;
 
@@ -289,14 +291,16 @@
 
     border: 1px solid #2563EB;
 
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    box-shadow: var(--color-sombra);
+
+    transition: background-color .3s ease;
 
 }
 
 
 .description-section h2 {
 
-    color: #111827;
+    color: var(--color-texto);
 
     margin-bottom: 15px;
 
@@ -305,7 +309,7 @@
 
 .description-section p {
 
-    color: #4B5563;
+    color: var(--color-texto-suave);
 
     line-height: 1.7;
 
@@ -335,7 +339,7 @@
 
     border: 1px solid #2563EB;
 
-    background: white;
+    background: var(--color-entrada);
 
     color: #2563EB;
 

@@ -1,62 +1,161 @@
 import "./FilterBar.css";
 
-function FilterBar({
+function FilterBar( {
   category,
   setCategory,
+  categorias = [],
   order,
   setOrder,
   price,
-  setPrice,
-}) {
+  setPrice
+} )
+{
+
   return (
+
     <div className="filter-bar">
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="">Todas las categorías</option>
 
-        <option value="Novela">Novela</option>
 
-        <option value="Tecnología">Tecnología</option>
+      {/* Categorías */ }
 
-        <option value="Ciencia">Ciencia</option>
+      <select
 
-        <option value="Historia">Historia</option>
+        value={ category }
 
-        <option value="Desarrollo personal">Desarrollo personal</option>
+        onChange={ ( e ) =>
+          setCategory( e.target.value )
+        }
 
-        <option value="Fantasía">Fantasía</option>
+      >
 
-        <option value="Ciencia ficción">Ciencia ficción</option>
+        <option value="">
+
+          Todas las categorías
+
+        </option>
+
+
+        { categorias.map( ( item ) => (
+          <option
+            key={ item.id }
+            value={ item.nombre }
+          >
+            { item.nombre }
+          </option>
+        ) ) }
+
       </select>
 
-      <select value={order} onChange={(e) => setOrder(e.target.value)}>
-        <option value="">Ordenar por</option>
 
-        <option value="destacados">Más destacados</option>
 
-        <option value="ventas">Más vendidos</option>
+      {/* Orden */ }
 
-        <option value="precio-menor">Precio menor a mayor</option>
+      <select
 
-        <option value="precio-mayor">Precio mayor a menor</option>
+        value={ order }
 
-        <option value="az">Nombre A-Z</option>
+        onChange={ ( e ) =>
+          setOrder( e.target.value )
+        }
 
-        <option value="za">Nombre Z-A</option>
+      >
+
+        <option value="">
+
+          Ordenar por
+
+        </option>
+
+        <option value="destacados">
+
+          Más destacados
+
+        </option>
+
+        <option value="ventas">
+
+          Más vendidos
+
+        </option>
+
+        <option value="precio-menor">
+
+          Precio menor a mayor
+
+        </option>
+
+        <option value="precio-mayor">
+
+          Precio mayor a menor
+
+        </option>
+
+        <option value="az">
+
+          Nombre A-Z
+
+        </option>
+
+        <option value="za">
+
+          Nombre Z-A
+
+        </option>
+
       </select>
 
-      <select value={price} onChange={(e) => setPrice(e.target.value)}>
-        <option value="">Todos los precios</option>
 
-        <option value="40">Menos de $40.000</option>
 
-        <option value="60">$40.000 - $60.000</option>
+      {/* Precio */ }
 
-        <option value="80">$60.000 - $80.000</option>
+      <select
 
-        <option value="100">Más de $80.000</option>
+        value={ price }
+
+        onChange={ ( e ) =>
+          setPrice( e.target.value )
+        }
+
+      >
+
+        <option value="">
+
+          Todos los precios
+
+        </option>
+
+        <option value="40">
+
+          Menos de $40.000
+
+        </option>
+
+        <option value="60">
+
+          $40.000 - $60.000
+
+        </option>
+
+        <option value="80">
+
+          $60.000 - $80.000
+
+        </option>
+
+        <option value="100">
+
+          Más de $80.000
+
+        </option>
+
       </select>
+
+
     </div>
+
   );
+
 }
+
 
 export default FilterBar;

@@ -17,13 +17,13 @@
 
     border-radius: 10px;
 
-    border: 1px solid #D1D5DB;
+    border: 1px solid var(--color-borde);
 
-    background: white;
+    background: var(--color-entrada);
 
     font-size: 15px;
 
-    color: #111827;
+    color: var(--color-texto);
 
     cursor: pointer;
 

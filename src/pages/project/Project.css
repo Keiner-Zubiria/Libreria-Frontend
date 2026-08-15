@@ -10,7 +10,7 @@
 .project-header h1 {
     margin: 0;
     font-size: 42px;
-    color: #111827;
+    color: var(--color-texto);
 }
 .project-header p {
     margin-top: 12px;
@@ -24,20 +24,21 @@
     gap: 25px;
 }
 .project-section {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--color-superficie);
+    border: 1px solid var(--color-borde);
     border-radius: 16px;
     padding: 30px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    box-shadow: var(--color-sombra);
+    transition: background-color .3s ease, border-color .3s ease;
 }
 .project-section h2 {
     margin: 0 0 18px;
     font-size: 23px;
-    color: #111827;
+    color: var(--color-texto);
 }
 .project-section p {
     margin: 0 0 14px;
-    color: #6B7280;
+    color: var(--color-texto-suave);
     line-height: 1.7;
     font-size: 15px;
 }
@@ -56,8 +57,8 @@
     justify-content: space-between;
     gap: 20px;
     padding: 12px 0;
-    border-bottom: 1px solid #F3F4F6;
-    color: #4B5563;
+    border-bottom: 1px solid var(--color-borde);
+    color: var(--color-texto-suave);
     line-height: 1.5;
 }
 .project-list li:last-child {
@@ -73,17 +74,17 @@
     white-space: nowrap;
 }
 .status-implemented {
-    background: #ECFDF5;
+    background: var(--color-exito-suave);
     color: #15803D;
 }
 .status-building {
-    background: #FFF7ED;
+    background: var(--color-warning-suave);
     color: #C2410C;
 }
 .security-list li {
     position: relative;
     padding: 8px 0 8px 18px;
-    color: #4B5563;
+    color: var(--color-texto-suave);
     line-height: 1.5;
     font-size: 15px;
 }
@@ -104,8 +105,8 @@
 }
 .project-card {
     padding: 22px;
-    background: #F9FAFB;
-    border: 1px solid #E5E7EB;
+    background: var(--color-superficie-2);
+    border: 1px solid var(--color-borde);
     border-radius: 12px;
 }
 .project-card h3 {
@@ -120,11 +121,22 @@
     display: inline-block;
     margin-top: 15px;
     padding: 6px 10px;
-    background: #FFF7ED;
+    background: var(--color-warning-suave);
     color: #C2410C;
     border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
+}
+.technology-group {
+    margin-bottom: 18px;
+}
+.technology-group:last-child {
+    margin-bottom: 0;
+}
+.technology-group h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    color: var(--color-texto);
 }
 .technology-list {
     display: flex;
@@ -133,7 +145,7 @@
 }
 .technology-list span {
     padding: 9px 14px;
-    background: #EFF6FF;
+    background: var(--color-primario-suave);
     color: #2563EB;
     border-radius: 8px;
     font-size: 14px;

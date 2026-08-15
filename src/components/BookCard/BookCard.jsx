@@ -4,12 +4,17 @@ import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import CartContext from "../../context/CartContext";
+import AlertContext from "../../context/AlertContext.jsx";
+import { UPLOADS_URL } from "../../config/api";
 
 
 // Componente encargado de mostrar la información de un libro individual.
-function BookCard({ book }) {
+function BookCard( { book } )
+{
 
-    const { addToCart } = useContext(CartContext);
+    const { addToCart } = useContext( CartContext );
+
+    const { mostrarMensaje } = useContext( AlertContext );
 
 
     // Precio mostrado inicialmente en la tarjeta.
@@ -20,59 +25,63 @@ function BookCard({ book }) {
     return (
 
         <Link
-            to={`/libro/${book.id}`}
+            to={ `/libro/${ book.id }` }
             className="book-link"
         >
 
             <article className="book-card">
 
 
-                {/* Imagen del libro */}
+                {/* Imagen del libro */ }
                 <div className="book-image">
 
                     <img
-                        src={book.imagen}
-                        alt={book.titulo}
+                        src={
+                            book.imagen
+                                ? `${UPLOADS_URL}/${ book.imagen }`
+                                : "/img/libro-default.jpg"
+                        }
+                        alt={ book.titulo }
                     />
 
                 </div>
 
 
-                {/* Información principal del libro */}
+                {/* Información principal del libro */ }
                 <div className="book-info">
 
 
-                    {/* Categoría */}
+                    {/* Categoría */ }
                     <span className="book-category">
 
-                        {book.categoria}
+                        { book.categoria }
 
                     </span>
 
 
-                    {/* Título */}
+                    {/* Título */ }
                     <h3>
 
-                        {book.titulo}
+                        { book.titulo }
 
                     </h3>
 
 
-                    {/* Autor */}
+                    {/* Autor */ }
                     <p className="book-author">
 
-                        {book.autor}
+                        { book.autor }
 
                     </p>
 
 
-                    {/* Precio y acción de compra */}
+                    {/* Precio y acción de compra */ }
                     <div className="book-footer">
 
 
                         <strong>
 
-                            ${precio.toLocaleString("es-CO")}
+                            ${ precio.toLocaleString( "es-CO" ) }
 
                         </strong>
 
@@ -81,14 +90,14 @@ function BookCard({ book }) {
 
                             className="cart-button"
 
-                            onClick={(e) => {
+                            onClick={ ( e ) =>
+                            {
 
                                 e.preventDefault();
+
                                 e.stopPropagation();
 
-
-                                // Agrega el libro con la misma estructura usada en el detalle.
-                                addToCart({
+                                addToCart( {
 
                                     ...book,
 
@@ -98,13 +107,21 @@ function BookCard({ book }) {
 
                                     quantity: 1
 
-                                });
+                                } );
 
-                            }}
+                                mostrarMensaje(
+
+                                    "Libro agregado al carrito.",
+
+                                    "success"
+
+                                );
+
+                            } }
 
                         >
 
-                            <ShoppingCart size={18} />
+                            <ShoppingCart size={ 18 } />
 
                             Agregar
 

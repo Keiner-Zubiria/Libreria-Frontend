@@ -1,47 +1,59 @@
 import "./Catalog.css";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import booksData from "../../data/books";
+import { obtenerLibros } from "../../services/libroService";
+import { obtenerCategorias } from "../../services/categoriaService";
 
 import SearchBar from "../../components/SearchBar/SearchBar";
 import FilterBar from "../../components/FilterBar/FilterBar";
 import ProductGrid from "../../components/ProductGrid/ProductGrid";
 
-
-// Obtiene los libros desde localStorage o usa los iniciales.
-const libros = JSON.parse(localStorage.getItem("libros")) || booksData;
-
-
-// Página donde se mostrará el catálogo completo.
 function Catalog()
 {
-
     const [ searchParams ] = useSearchParams();
 
+    const [ libros, setLibros ] = useState( [] );
 
     const [ search, setSearch ] = useState(
-
-        searchParams.get("buscar") || ""
-
+        searchParams.get( "buscar" ) || ""
     );
 
-
     const [ category, setCategory ] = useState( "" );
-
     const [ order, setOrder ] = useState( "" );
-
     const [ price, setPrice ] = useState( "" );
 
+    const [ categorias, setCategorias ] = useState( [] );
 
+    useEffect( () =>
+    {
+        const cargarDatos = async () =>
+        {
+            try
+            {
+                const librosResponse = await obtenerLibros();
+                const categoriasResponse = await obtenerCategorias();
+
+                setLibros( librosResponse.data );
+                setCategorias( categoriasResponse.data );
+
+            }
+            catch ( error )
+            {
+                console.error( "Error al cargar el catálogo:", error );
+            }
+        };
+
+        cargarDatos();
+
+    }, [] );
 
     // Aplica búsqueda, categoría y precio al catálogo.
-    let filteredBooks = libros.filter((book) =>
+    let filteredBooks = libros.filter( ( book ) =>
     {
 
         const text = search.toLowerCase();
-
 
         const matchesSearch =
 
@@ -49,22 +61,15 @@ function Catalog()
 
             book.autor.toLowerCase().includes( text );
 
-
-
         const matchesCategory =
 
             category === "" ||
 
             book.categoria === category;
 
-
-
         const precio = book.precioFisico || 0;
 
-
         let matchesPrice = true;
-
-
 
         if ( price === "40" )
         {
@@ -72,8 +77,6 @@ function Catalog()
             matchesPrice = precio < 40000;
 
         }
-
-
 
         if ( price === "60" )
         {
@@ -86,8 +89,6 @@ function Catalog()
 
         }
 
-
-
         if ( price === "80" )
         {
 
@@ -99,16 +100,12 @@ function Catalog()
 
         }
 
-
-
         if ( price === "100" )
         {
 
             matchesPrice = precio > 80000;
 
         }
-
-
 
         return (
 
@@ -120,29 +117,25 @@ function Catalog()
 
         );
 
-    });
-
-
+    } );
 
     if ( order === "destacados" )
     {
 
         filteredBooks = filteredBooks.filter(
 
-            (book) => book.destacado
+            ( book ) => book.destacado
 
         );
 
     }
-
-
 
     if ( order === "precio-menor" )
     {
 
         filteredBooks.sort(
 
-            (a,b) =>
+            ( a, b ) =>
 
                 a.precioFisico - b.precioFisico
 
@@ -150,14 +143,12 @@ function Catalog()
 
     }
 
-
-
     if ( order === "precio-mayor" )
     {
 
         filteredBooks.sort(
 
-            (a,b) =>
+            ( a, b ) =>
 
                 b.precioFisico - a.precioFisico
 
@@ -165,37 +156,31 @@ function Catalog()
 
     }
 
-
-
     if ( order === "az" )
     {
 
         filteredBooks.sort(
 
-            (a,b) =>
+            ( a, b ) =>
 
-                a.titulo.localeCompare(b.titulo)
+                a.titulo.localeCompare( b.titulo )
 
         );
 
     }
-
-
 
     if ( order === "za" )
     {
 
         filteredBooks.sort(
 
-            (a,b) =>
+            ( a, b ) =>
 
-                b.titulo.localeCompare(a.titulo)
+                b.titulo.localeCompare( a.titulo )
 
         );
 
     }
-
-
 
     if ( order === "ventas" )
     {
@@ -204,32 +189,23 @@ function Catalog()
 
             .sort(
 
-                (a,b) =>
+                ( a, b ) =>
 
-                    b.vendidos - a.vendidos
+                    ( b.vendidos || 0 ) - ( a.vendidos || 0 )
 
             )
 
-            .slice(0,10);
+            .slice( 0, 10 );
 
     }
-
-
 
     return (
 
         <main className="catalog">
 
-
             <div className="catalog-header">
 
-
-                <h1>
-
-                    Catálogo
-
-                </h1>
-
+                <h1>Catálogo</h1>
 
                 <p>
 
@@ -237,69 +213,54 @@ function Catalog()
 
                 </p>
 
-
             </div>
-
-
-
 
             <SearchBar
 
-                search={search}
+                search={ search }
 
-                setSearch={setSearch}
+                setSearch={ setSearch }
 
             />
-
-
-
 
             <FilterBar
 
-                category={category}
+                category={ category }
 
-                setCategory={setCategory}
+                setCategory={ setCategory }
 
-                order={order}
+                categorias={ categorias }
 
-                setOrder={setOrder}
+                order={ order }
 
-                price={price}
+                setOrder={ setOrder }
 
-                setPrice={setPrice}
+                price={ price }
+
+                setPrice={ setPrice }
 
             />
-
-
-
 
             <div className="catalog-results">
 
-
                 <p>
 
-                    {filteredBooks.length} libros encontrados
+                    { filteredBooks.length } libros encontrados
 
                 </p>
 
-
             </div>
-
-
-
 
             <ProductGrid
 
-                books={filteredBooks}
+                books={ filteredBooks }
 
             />
-
 
         </main>
 
     );
 
 }
-
 
 export default Catalog;
