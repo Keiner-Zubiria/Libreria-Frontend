@@ -16,7 +16,7 @@ import
 import CartContext from "../../context/CartContext";
 import AuthContext from "../../context/AuthContext";
 import AlertContext from "../../context/AlertContext";
-import { API_URL, UPLOADS_URL, authFetch } from "../../config/api";
+import { API_URL, imagenUrl, authFetch } from "../../config/api";
 
 
 // Página para finalizar una compra.
@@ -648,7 +648,7 @@ function Checkout()
 
                                                         ?
 
-                                                        `${UPLOADS_URL}/${ item.imagen }`
+                                                        imagenUrl( item.imagen )
 
                                                         :
 

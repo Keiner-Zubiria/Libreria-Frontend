@@ -17,7 +17,7 @@ import
 
 import AuthContext from "../../context/AuthContext";
 import AlertContext from "../../context/AlertContext";
-import { API_URL, UPLOADS_URL, authFetch } from "../../config/api";
+import { API_URL, imagenUrl, authFetch } from "../../config/api";
 
 
 // Página donde el usuario puede consultar sus pedidos.
@@ -717,7 +717,7 @@ function Orders()
 
                                                                                             src={
                                                                                                 detalle.imagen
-                                                                                                    ? `${UPLOADS_URL}/${ detalle.imagen }`
+                                                                                                    ? imagenUrl( detalle.imagen )
                                                                                                     : "/images/default-book.jpg"
                                                                                             }
 

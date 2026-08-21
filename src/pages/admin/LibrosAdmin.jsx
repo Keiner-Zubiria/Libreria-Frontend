@@ -11,7 +11,7 @@ import {
 
 import LibroModal from "./LibroModal";
 
-import { UPLOADS_URL } from "../../config/api";
+import { imagenUrl } from "../../config/api";
 
 import {
     obtenerLibros,
@@ -306,7 +306,7 @@ function LibrosAdmin()
                                 <img
                                     src={
                                         libro.imagen
-                                            ? `${UPLOADS_URL}/${ libro.imagen }`
+                                            ? imagenUrl( libro.imagen )
                                             : "/images/default-book.jpg"
                                     }
                                     alt={`Portada de ${ libro.titulo }`}

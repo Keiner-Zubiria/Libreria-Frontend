@@ -13,7 +13,7 @@ import {
 import AlertContext from "../../context/AlertContext";
 import CartContext from "../../context/CartContext";
 import AuthContext from "../../context/AuthContext";
-import { UPLOADS_URL } from "../../config/api";
+import { imagenUrl } from "../../config/api";
 
 function Cart()
 {
@@ -126,7 +126,7 @@ function Cart()
                                     <img
                                         src={
                                             item.imagen
-                                                ? `${UPLOADS_URL}/${ item.imagen }`
+                                                ? imagenUrl( item.imagen )
                                                 : "/images/default-book.jpg"
                                         }
                                         alt={`Portada de ${ item.titulo }`}

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useContext } from "react";
 import CartContext from "../../context/CartContext";
 import AlertContext from "../../context/AlertContext.jsx";
-import { UPLOADS_URL } from "../../config/api";
+import { imagenUrl } from "../../config/api";
 
 
 // Componente encargado de mostrar la información de un libro individual.
@@ -36,11 +36,7 @@ function BookCard( { book } )
                 <div className="book-image">
 
                     <img
-                        src={
-                            book.imagen
-                                ? `${UPLOADS_URL}/${ book.imagen }`
-                                : "/img/libro-default.jpg"
-                        }
+                        src={ imagenUrl( book.imagen ) || "/img/libro-default.jpg" }
                         alt={ book.titulo }
                     />
 

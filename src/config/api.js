@@ -4,6 +4,13 @@ export const API_URL =
 export const UPLOADS_URL =
     `${API_URL}/uploads`;
 
+export function imagenUrl( imagen )
+{
+    if ( !imagen ) return null;
+    if ( imagen.startsWith( "http" ) ) return imagen;
+    return `${ UPLOADS_URL }/${ imagen }`;
+}
+
 
 // fetch con el token de acceso agregado automáticamente.
 export const authFetch = async ( url, opciones = {} ) =>

@@ -11,7 +11,7 @@ import {
     CreditCard
 } from "lucide-react";
 
-import { API_URL, UPLOADS_URL, authFetch } from "../../config/api";
+import { API_URL, imagenUrl, authFetch } from "../../config/api";
 
 function PedidosAdmin()
 {
@@ -866,7 +866,7 @@ function PedidosAdmin()
 
                                                                                             producto.imagen
 
-                                                                                                ? `${UPLOADS_URL}/${ producto.imagen }`
+                                                                                                ? imagenUrl( producto.imagen )
 
                                                                                                 : "/images/default-book.jpg"
 

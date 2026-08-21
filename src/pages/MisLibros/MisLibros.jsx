@@ -13,7 +13,7 @@ import
 
 import AuthContext from "../../context/AuthContext";
 import AlertContext from "../../context/AlertContext";
-import { API_URL, UPLOADS_URL, authFetch } from "../../config/api";
+import { API_URL, imagenUrl, authFetch } from "../../config/api";
 
 
 // Página donde el usuario ve los libros digitales que ha comprado.
@@ -298,7 +298,7 @@ function MisLibros()
                                             <img
                                                 src={
                                                     libro.imagen
-                                                        ? `${UPLOADS_URL}/${ libro.imagen }`
+                                                        ? imagenUrl( libro.imagen )
                                                         : "/images/default-book.jpg"
                                                 }
                                                 alt={ `Portada de ${ libro.titulo }` }

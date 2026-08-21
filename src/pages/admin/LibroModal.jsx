@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 
 import { X } from "lucide-react";
 
-import { API_URL, UPLOADS_URL } from "../../config/api";
+import { API_URL, imagenUrl } from "../../config/api";
 
 
 
@@ -87,7 +87,7 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
     // Vista previa de la imagen.
     const [ imagenPreview, setImagenPreview ] = useState(
         libroEditar?.imagen
-            ? `${UPLOADS_URL}/${ libroEditar.imagen }`
+            ? imagenUrl( libroEditar.imagen )
             : ""
     );
 

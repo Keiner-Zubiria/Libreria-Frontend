@@ -13,7 +13,7 @@ import
 } from "lucide-react";
 
 import { obtenerLibro } from "../../services/libroService";
-import { UPLOADS_URL } from "../../config/api";
+import { imagenUrl } from "../../config/api";
 
 import CartContext from "../../context/CartContext";
 import AuthContext from "../../context/AuthContext";
@@ -224,7 +224,7 @@ function BookDetail()
 
                             book.imagen
 
-                                ? `${UPLOADS_URL}/${ book.imagen }`
+                                ? imagenUrl( book.imagen )
 
                                 : "/images/default-book.jpg"
 
