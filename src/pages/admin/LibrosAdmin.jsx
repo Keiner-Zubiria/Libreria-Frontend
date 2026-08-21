@@ -6,7 +6,9 @@ import {
     Plus,
     Pencil,
     Trash2,
-    Search
+    Search,
+    Eye,
+    EyeOff
 } from "lucide-react";
 
 import LibroModal from "./LibroModal";
@@ -14,9 +16,10 @@ import LibroModal from "./LibroModal";
 import { imagenUrl } from "../../config/api";
 
 import {
-    obtenerLibros,
+    obtenerLibrosAdmin,
     crearLibro,
     actualizarLibro,
+    toggleActivo,
     eliminarLibro as eliminarLibroService
 } from "../../services/libroService";
 
@@ -29,6 +32,7 @@ function LibrosAdmin()
     const [ categoria, setCategoria ] = useState( "Todas" );
     const [ formato, setFormato ] = useState( "Todos" );
     const [ stock, setStock ] = useState( "Todos" );
+    const [ estado, setEstado ] = useState( "Todos" );
 
     const [ modalAbierto, setModalAbierto ] = useState( false );
     const [ libroEditar, setLibroEditar ] = useState( null );
@@ -38,7 +42,7 @@ function LibrosAdmin()
     {
         try
         {
-            const response = await obtenerLibros();
+            const response = await obtenerLibrosAdmin();
 
             const librosConvertidos = response.data.map(
                 ( libro ) => ( {
@@ -114,7 +118,7 @@ function LibrosAdmin()
     const eliminarLibro = async ( id ) =>
     {
         const confirmar = window.confirm(
-            "¿Seguro que deseas eliminar este libro del catálogo?"
+            "¿Seguro que deseas eliminar este libro permanentemente? Esta acción no se puede deshacer."
         );
 
         if ( !confirmar )
@@ -124,7 +128,8 @@ function LibrosAdmin()
 
         try
         {
-            await eliminarLibroService( id );
+            const response = await eliminarLibroService( id );
+            alert( response.data );
             await cargarLibros();
         }
         catch ( error )
@@ -133,6 +138,34 @@ function LibrosAdmin()
             alert( typeof mensaje === "string" ? mensaje : JSON.stringify( mensaje ) );
             console.error(
                 "Error al eliminar libro:",
+                error
+            );
+        }
+    };
+
+    const toggleLibroActivo = async ( id, activoActual ) =>
+    {
+        const accion = activoActual ? "desactivar" : "activar";
+        const confirmar = window.confirm(
+            `¿Seguro que deseas ${ accion } este libro?`
+        );
+
+        if ( !confirmar )
+        {
+            return;
+        }
+
+        try
+        {
+            await toggleActivo( id );
+            await cargarLibros();
+        }
+        catch ( error )
+        {
+            const mensaje = error.response?.data || "No fue posible cambiar el estado del libro.";
+            alert( typeof mensaje === "string" ? mensaje : JSON.stringify( mensaje ) );
+            console.error(
+                "Error al cambiar estado del libro:",
                 error
             );
         }
@@ -159,11 +192,17 @@ function LibrosAdmin()
             ( stock === "Disponible" && libro.stock > 0 ) ||
             ( stock === "Agotado" && libro.stock === 0 );
 
+        const coincideEstado =
+            estado === "Todos" ||
+            ( estado === "Activos" && libro.activo !== false ) ||
+            ( estado === "Inactivos" && libro.activo === false );
+
         return (
             coincideBusqueda &&
             coincideCategoria &&
             coincideFormato &&
-            coincideStock
+            coincideStock &&
+            coincideEstado
         );
     } );
 
@@ -272,6 +311,25 @@ function LibrosAdmin()
                     </option>
                 </select>
 
+                <select
+                    value={ estado }
+                    onChange={ ( e ) =>
+                        setEstado( e.target.value )
+                    }
+                >
+                    <option value="Todos">
+                        Todos los estados
+                    </option>
+
+                    <option value="Activos">
+                        Activos
+                    </option>
+
+                    <option value="Inactivos">
+                        Inactivos
+                    </option>
+                </select>
+
             </div>
 
             <p className="results-count">
@@ -322,6 +380,12 @@ function LibrosAdmin()
                                     <span>
                                         {libro.autor}
                                     </span>
+
+                                    {libro.activo === false && (
+                                        <span className="inactive-badge">
+                                            Inactivo
+                                        </span>
+                                    )}
                                 </div>
 
                             </div>
@@ -347,6 +411,21 @@ function LibrosAdmin()
                             >
                                 <button
                                     type="button"
+                                    className={ `btn-toggle ${ libro.activo === false ? "inactivo" : "activo" }` }
+                                    title={ libro.activo === false ? "Activar libro" : "Desactivar libro" }
+                                    aria-label={ `${ libro.activo === false ? "Activar" : "Desactivar" } ${ libro.titulo }` }
+                                    onClick={ () =>
+                                        toggleLibroActivo( libro.id, libro.activo !== false )
+                                    }
+                                >
+                                    {libro.activo === false
+                                        ? <EyeOff size={ 18 } />
+                                        : <Eye size={ 18 } />
+                                    }
+                                </button>
+
+                                <button
+                                    type="button"
                                     title="Editar libro"
                                     aria-label={`Editar ${ libro.titulo }`}
                                     onClick={ () =>
@@ -358,7 +437,8 @@ function LibrosAdmin()
 
                                 <button
                                     type="button"
-                                    title="Eliminar libro"
+                                    className="btn-delete"
+                                    title="Eliminar permanentemente"
                                     aria-label={`Eliminar ${ libro.titulo }`}
                                     onClick={ () =>
                                         eliminarLibro( libro.id )

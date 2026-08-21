@@ -213,6 +213,14 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
 
         formData.append( "destacado", libro.destacado );
 
+        if ( libroEditar )
+        {
+            formData.append(
+                "activo",
+                libro.activo !== undefined ? libro.activo : true
+            );
+        }
+
         if ( archivoImagen )
         {
             formData.append( "imagen", archivoImagen );
@@ -739,6 +747,36 @@ function LibroModal( { onClose, onGuardar, libroEditar } )
                             Destacado
 
                         </label>
+
+                        { libroEditar && (
+
+                            <label>
+
+                                <input
+
+                                    type="checkbox"
+
+                                    checked={ libro.activo !== false }
+
+                                    onChange={ ( e ) =>
+
+                                        setLibro( ( anterior ) => ( {
+
+                                            ...anterior,
+
+                                            activo: e.target.checked
+
+                                        } ) )
+
+                                    }
+
+                                />
+
+                                Activo
+
+                            </label>
+
+                        ) }
 
                     </div>
 

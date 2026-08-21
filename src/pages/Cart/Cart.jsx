@@ -1,6 +1,6 @@
 import "./Cart.css";
 
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -14,6 +14,7 @@ import AlertContext from "../../context/AlertContext";
 import CartContext from "../../context/CartContext";
 import AuthContext from "../../context/AuthContext";
 import { imagenUrl } from "../../config/api";
+import { obtenerLibros } from "../../services/libroService";
 
 function Cart()
 {
@@ -27,6 +28,42 @@ function Cart()
     const { mostrarMensaje } = useContext( AlertContext );
 
     const navigate = useNavigate();
+
+    useEffect( () =>
+    {
+        if ( cart.length === 0 ) return;
+
+        const validarCarrito = async () =>
+        {
+            try
+            {
+                const activosResp = await obtenerLibros();
+                const activosIds = activosResp.data.map( l => l.id );
+                const inactivos = cart.filter(
+                    item => !activosIds.includes( item.id )
+                );
+
+                if ( inactivos.length > 0 )
+                {
+                    inactivos.forEach( item =>
+                        removeFromCart( item.id, item.formato )
+                    );
+                    const nombres = inactivos.map( i => i.titulo ).join( ", " );
+                    mostrarMensaje(
+                        `Se removieron libros que ya no están disponibles: ${ nombres }`,
+                        "warning"
+                    );
+                }
+            }
+            catch ( error )
+            {
+                console.error( "Error al validar carrito:", error );
+            }
+        };
+
+        validarCarrito();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [] );
 
     const total = cart.reduce(
         ( acc, item ) =>

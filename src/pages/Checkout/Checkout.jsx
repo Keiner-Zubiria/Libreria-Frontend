@@ -17,6 +17,7 @@ import CartContext from "../../context/CartContext";
 import AuthContext from "../../context/AuthContext";
 import AlertContext from "../../context/AlertContext";
 import { API_URL, imagenUrl, authFetch } from "../../config/api";
+import { obtenerLibros } from "../../services/libroService";
 
 
 // Página para finalizar una compra.
@@ -27,7 +28,7 @@ function Checkout()
 
     const location = useLocation();
 
-    const { cart, clearCart } = useContext( CartContext );
+    const { cart, clearCart, removeFromCart } = useContext( CartContext );
 
     const { usuario } = useContext( AuthContext );
 
@@ -152,6 +153,34 @@ function Checkout()
 
             return;
 
+        }
+
+        // Verifica que los libros sigan activos en el catálogo.
+        try
+        {
+            const activosResp = await obtenerLibros();
+            const activosIds = activosResp.data.map( l => l.id );
+            const inactivos = productos.filter(
+                item => !activosIds.includes( item.id )
+            );
+
+            if ( inactivos.length > 0 )
+            {
+                const nombres = inactivos.map( i => i.titulo ).join( ", " );
+                mostrarMensaje(
+                    `Los siguientes libros ya no están disponibles: ${ nombres }.`,
+                    "warning"
+                );
+                if ( !compraDirecta )
+                {
+                    inactivos.forEach( item => removeFromCart( item.id, item.formato ) );
+                }
+                return;
+            }
+        }
+        catch ( error )
+        {
+            console.error( "Error al validar libros:", error );
         }
 
 

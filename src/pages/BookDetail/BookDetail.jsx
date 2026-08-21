@@ -104,6 +104,54 @@ function BookDetail()
 
     }
 
+    // Si el libro está inactivo.
+    if ( book.activo === false )
+    {
+
+        return (
+
+            <main className="book-detail">
+
+                <section className="detail-container">
+
+                    <div className="detail-info">
+
+                        <h2>
+
+                            Este libro ya no está disponible
+
+                        </h2>
+
+                        <p>
+
+                            El libro "{ book.titulo }" ha sido retirado del catálogo.
+
+                        </p>
+
+                        <button
+
+                            type="button"
+
+                            className="add-to-cart-button"
+
+                            onClick={ () => navigate( "/catalogo" ) }
+
+                        >
+
+                            Volver al catálogo
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+        );
+
+    }
+
 
     // Precio según formato.
     const precio =

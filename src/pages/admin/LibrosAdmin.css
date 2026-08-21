@@ -52,7 +52,7 @@
     display: grid;
     grid-template-columns:
         minmax(220px, 2fr)
-        repeat(3, minmax(150px, 1fr));
+        repeat(4, minmax(140px, 1fr));
     gap: 12px;
     margin-bottom: 15px;
 }
@@ -222,22 +222,40 @@
     transition: .2s;
 }
 
-.book-actions button:first-child {
+.book-actions .btn-toggle.activo {
+    background: var(--color-exito-suave);
+    color: #16A34A;
+}
+
+.book-actions .btn-toggle.activo:hover {
+    background: #dcfce7;
+}
+
+.book-actions .btn-toggle.inactivo {
+    background: var(--color-advertencia-suave, #FEF3C7);
+    color: #D97706;
+}
+
+.book-actions .btn-toggle.inactivo:hover {
+    background: #fef9c3;
+}
+
+.book-actions button[title="Editar libro"] {
     background: var(--color-primario-suave);
     color: #2563EB;
 }
 
-.book-actions button:first-child:hover {
-    background: var(--color-primario-suave);
+.book-actions button[title="Editar libro"]:hover {
+    background: #dbeafe;
 }
 
-.book-actions button:last-child {
+.book-actions .btn-delete {
     background: var(--color-error-suave);
     color: #DC2626;
 }
 
-.book-actions button:last-child:hover {
-    background: var(--color-error-suave);
+.book-actions .btn-delete:hover {
+    background: #fee2e2;
 }
 
 /* Sin resultados */
@@ -250,7 +268,7 @@
 
 /* Tablets */
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
 
     .books-filters {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -387,4 +405,16 @@
     .table-row {
         padding: 15px;
     }
+}
+
+.inactive-badge {
+    display: inline-block;
+    background: #DC2626;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
 }
