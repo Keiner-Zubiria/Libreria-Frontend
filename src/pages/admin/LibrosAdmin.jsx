@@ -129,6 +129,8 @@ function LibrosAdmin()
         }
         catch ( error )
         {
+            const mensaje = error.response?.data || "No fue posible eliminar el libro.";
+            alert( typeof mensaje === "string" ? mensaje : JSON.stringify( mensaje ) );
             console.error(
                 "Error al eliminar libro:",
                 error
